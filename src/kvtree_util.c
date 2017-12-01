@@ -9,7 +9,7 @@
  * Please also read this file: LICENSE.TXT.
 */
 
-/* Implements some common tasks for SCR operations on hashes */
+/* Implements some common tasks for operations on kvtrees */
 
 #include "kvtree.h"
 #include "kvtree_util.h"
