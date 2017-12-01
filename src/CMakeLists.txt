@@ -18,6 +18,7 @@ LIST(APPEND libkvtree_srcs
     kvtree_io.c
     kvtree_helpers.c
     kvtree_err.c
+    tv_data_display.c
 )
 
 IF(MPI)
