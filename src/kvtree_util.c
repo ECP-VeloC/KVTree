@@ -21,18 +21,17 @@
 #include <sys/stat.h>
 #include <stdint.h>
 
+/* need at least version 8.5 of queue.h from Berkeley */
+#include "queue.h"
+
 int kvtree_util_set_bytecount(kvtree* hash, const char* key, unsigned long count)
 {
   /* first, unset any current setting */
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_setf(hash, NULL, "%s %lu", key, count);
+  kvtree_setf(hash, NULL, "%s %lu", key, count);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
@@ -42,12 +41,8 @@ int kvtree_util_set_crc32(kvtree* hash, const char* key, uLong crc)
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_setf(hash, NULL, "%s %#x", key, (uint32_t) crc);
+  kvtree_setf(hash, NULL, "%s %#x", key, (uint32_t) crc);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
@@ -57,12 +52,8 @@ int kvtree_util_set_int(kvtree* hash, const char* key, int value)
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_set_kv_int(hash, key, value);
+  kvtree_set_kv_int(hash, key, value);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
@@ -72,12 +63,8 @@ int kvtree_util_set_unsigned_long(kvtree* hash, const char* key, unsigned long v
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_setf(hash, NULL, "%s %lu", key, value);
+  kvtree_setf(hash, NULL, "%s %lu", key, value);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
@@ -87,12 +74,8 @@ int kvtree_util_set_str(kvtree* hash, const char* key, const char* value)
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_set_kv(hash, key, value);
+  kvtree_set_kv(hash, key, value);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
@@ -102,12 +85,8 @@ int kvtree_util_set_int64(kvtree* hash, const char* key, int64_t value)
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_setf(hash, NULL, "%s %lld", key, value);
+  kvtree_setf(hash, NULL, "%s %lld", key, value);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
@@ -117,12 +96,8 @@ int kvtree_util_set_double(kvtree* hash, const char* key, double value)
   kvtree_unset(hash, key);
 
   /* then set the new value */
-  kvtree* hash2 = kvtree_setf(hash, NULL, "%s %f", key, value);
+  kvtree_setf(hash, NULL, "%s %f", key, value);
 
-  /* if there wasn't a hash, return failure */
-  if (hash2 == NULL) {
-    return KVTREE_FAILURE;
-  }
   return KVTREE_SUCCESS;
 }
 
