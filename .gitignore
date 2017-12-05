@@ -1,3 +1,8 @@
+# Ignore test executables
+# Do first so other rules apply
+test/test*
+!test/test*.*
+
 # Backup files
 *~
 \#*\#
