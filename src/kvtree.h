@@ -9,14 +9,43 @@
  * Please also read this file: LICENSE.TXT.
 */
 
+/* Several lines are reproduced from queue.h, under the following license */
+
+/*
+ * Copyright (c) 1991, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	@(#)queue.h	8.5 (Berkeley) 8/20/94
+ */
 #ifndef KVTREE_H
 #define KVTREE_H
 
 #include <stdarg.h>
 #include <sys/types.h>
-
-/* need at least version 8.5 of queue.h from Berkeley */
-#include "queue.h"
 
 /*
 =========================================
@@ -181,34 +210,6 @@ Define common hash key strings
 #define KVTREE_CONFIG_KEY_TYPE       ("TYPE")
 #define KVTREE_CONFIG_KEY_VIEW       ("VIEW")
 
-#define KVTREE_DATASET_KEY_ID       ("ID")
-#define KVTREE_DATASET_KEY_USER     ("USER")
-#define KVTREE_DATASET_KEY_JOBNAME  ("JOBNAME")
-#define KVTREE_DATASET_KEY_NAME     ("NAME")
-#define KVTREE_DATASET_KEY_SIZE     ("SIZE")
-#define KVTREE_DATASET_KEY_FILES    ("FILES")
-#define KVTREE_DATASET_KEY_CREATED  ("CREATED")
-#define KVTREE_DATASET_KEY_JOBID    ("JOBID")
-#define KVTREE_DATASET_KEY_CLUSTER  ("CLUSTER")
-#define KVTREE_DATASET_KEY_CKPT     ("CKPT")
-#define KVTREE_DATASET_KEY_COMPLETE ("COMPLETE")
-#define KVTREE_DATASET_KEY_FLAG_CKPT   ("FLAG_CKPT")
-#define KVTREE_DATASET_KEY_FLAG_OUTPUT ("FLAG_OUTPUT")
-
-#define KVTREE_META_KEY_CKPT     ("CKPT")
-#define KVTREE_META_KEY_RANKS    ("RANKS")
-#define KVTREE_META_KEY_RANK     ("RANK")
-#define KVTREE_META_KEY_ORIG     ("ORIG")
-#define KVTREE_META_KEY_PATH     ("PATH")
-#define KVTREE_META_KEY_NAME     ("NAME")
-#define KVTREE_META_KEY_FILE     ("FILE")
-#define KVTREE_META_KEY_SIZE     ("SIZE")
-#define KVTREE_META_KEY_TYPE     ("TYPE")
-#define KVTREE_META_KEY_TYPE_USER ("USER")
-#define KVTREE_META_KEY_TYPE_XOR  ("XOR")
-#define KVTREE_META_KEY_CRC      ("CRC")
-#define KVTREE_META_KEY_COMPLETE ("COMPLETE")
-
 #define KVTREE_KEY_COPY_XOR_CHUNK   ("CHUNK")
 #define KVTREE_KEY_COPY_XOR_DATASET ("DSET")
 #define KVTREE_KEY_COPY_XOR_CURRENT ("CURRENT")
@@ -229,13 +230,21 @@ Define hash and element structures
 
 /* define the structure for the head of a hash */
 struct kvtree_elem_struct;
-LIST_HEAD(kvtree_struct, kvtree_elem_struct);
+
+// the following 3 lines reproduced from queue.h
+struct kvtree_struct{
+  struct kvtree_elem_struct *lh_first;
+};
 
 /* define the structure for an element of a hash */
 struct kvtree_elem_struct {
   char* key;
   struct kvtree_struct* hash;
-  LIST_ENTRY(kvtree_elem_struct) pointers;
+  // the following 4 lines reproduced from queue.h
+  struct{
+    struct kvtree_elem_struct *le_next; /* next element */
+    struct kvtree_elem_struct **le_prev; /* address of previos next element */
+  } pointers;
 };
 
 typedef struct kvtree_struct      kvtree;
