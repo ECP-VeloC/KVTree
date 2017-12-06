@@ -1,0 +1,9 @@
+#!/bin/bash
+
+test=`$1 $2/flush.scr`
+expected=`cat $2/flush_file_print.scr`
+
+if [[ "$test" != "$expected" ]]; then
+    exit 1
+fi
+exit 0
