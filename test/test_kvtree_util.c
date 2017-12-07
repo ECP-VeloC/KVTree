@@ -117,23 +117,10 @@ int test_kvtree_util_set_get_double(){
 }
 
 void test_kvtree_util_init(){
-  char* test_name;
-  test_ptrs[num_tests] = test_kvtree_util_set_get_bytecount;
-  test_name = strdup("test_kvtree_util_set_get_bytecount");
-  test_names[num_tests++] = test_name;
-  test_ptrs[num_tests] = test_kvtree_util_set_get_int;
-  test_name = strdup("test_kvtree_util_set_get_int");
-  test_names[num_tests++] = test_name;
-  test_ptrs[num_tests] = test_kvtree_util_set_get_unsigned_long;
-  test_name = strdup("test_kvtree_util_set_get_unsigned_long");
-  test_names[num_tests++] = test_name;
-  test_ptrs[num_tests] = test_kvtree_util_set_get_str;
-  test_name = strdup("test_kvtree_util_set_get_str");
-  test_names[num_tests++] = test_name;
-  test_ptrs[num_tests] = test_kvtree_util_set_get_int64;
-  test_name = strdup("test_kvtree_util_set_get_int64");
-  test_names[num_tests++] = test_name;
-  test_ptrs[num_tests] = test_kvtree_util_set_get_double;
-  test_name = strdup("test_kvtree_util_set_get_double");
-  test_names[num_tests++] = test_name;
+  register_test(test_kvtree_util_set_get_bytecount, "test_kvtree_util_set_get_bytecount");
+  register_test(test_kvtree_util_set_get_int, "test_kvtree_util_set_get_int");
+  register_test(test_kvtree_util_set_get_str, "test_kvtree_util_set_get_str");
+  register_test(test_kvtree_util_set_get_unsigned_long, "test_kvtree_util_set_get_unsigned_long");
+  register_test(test_kvtree_util_set_get_int64, "test_kvtree_util_set_get_int64");
+  register_test(test_kvtree_util_set_get_double, "test_kvtree_util_set_get_double");
 }

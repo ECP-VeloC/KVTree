@@ -15,6 +15,14 @@
 
 #include "stdlib.h"
 #include "stdio.h"
+#include "string.h"
+
+void register_test(test_ptr_t test, char* test_name){
+  char* name = strdup(test_name);
+  test_ptrs[num_tests] = test;
+  test_names[num_tests] = name;
+  num_tests++;
+}
 
 int main(int argc, char** argv){
   /* Initialize state to be filled in by init functions */
@@ -24,6 +32,7 @@ int main(int argc, char** argv){
 
   /* Initialize each test type */
   test_kvtree_allocate_delete_init();
+  test_kvtree_kv_init();
   test_kvtree_util_init();
 
   /* Initialize state to count failures */

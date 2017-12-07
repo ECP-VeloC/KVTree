@@ -30,9 +30,5 @@ int test_kvtree_allocate_delete(){
 }
 
 void test_kvtree_allocate_delete_init(){
-  test_ptrs[num_tests] = test_kvtree_allocate_delete;
-  /* Allocated strings will be deleted by main */
-  char* test_kvtree_allocate_delete_name = strdup("test_kvtree_allocate_delete");
-  test_names[num_tests] = test_kvtree_allocate_delete_name;
-  num_tests++;
+  register_test(test_kvtree_allocate_delete, "test_kvtree_allocate_delete");
 }

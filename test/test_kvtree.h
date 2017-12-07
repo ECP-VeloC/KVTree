@@ -30,4 +30,6 @@ int num_tests;
 test_ptr_t* test_ptrs;
 char** test_names;
 
+void register_test(test_ptr_t test, char* test_name);
+
 #endif //TEST_KVTREE_H

@@ -5,6 +5,7 @@
 LIST(APPEND kvtree_test_srcs
     test_kvtree.c
     test_kvtree_allocate_delete.c
+    test_kvtree_kv.c
     test_kvtree_util.c
 )
 

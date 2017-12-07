@@ -9,12 +9,13 @@
  * Please also read this file: LICENSE.TXT.
 */
 
-#ifndef TEST_KVTREE_ALLOCATE_DELETE_H
-#define TEST_KVTREE_ALLOCATE_DELETE_H
+#ifndef TEST_KVTREE_KV_H
+#define TEST_KVTREE_KV_H
 
 #include "test_kvtree.h"
 
-int test_kvtree_allocate_delete();
-void test_kvtree_allocate_delete_init();
+int test_kvtree_kv();
+int test_kvtree_kv_int();
+void test_kvtree_kv_init();
 
-#endif //TEST_KVTREE_ALLOCATE_DELETE_H
+#endif //TEST_KVTREE_KV_H
