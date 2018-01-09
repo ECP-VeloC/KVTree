@@ -51,8 +51,7 @@ in turn, contains a hash with a single element with a key `2`, which
 finally contains a hash having no elements.
 
 Often when displaying these trees, the guidelines are not shown and only
-the indentation is used, like so:
-
+the indentation is used, like so::
      RANK
        0
          FILES
@@ -85,18 +84,15 @@ This section lists the most common functions used when dealing with
 hashes. For a full listing, refer to comments in `scr_hash.h`. The
 implementation can be found in `scr_hash.c`.
 
-### Hash basics
+Hash basics
+++++++++++++
 
-First, before using a hash, one must allocate a hash object.
+First, before using a hash, one must allocate a hash object.::
 
-\small 
-\samepage
       scr_hash* hash = scr_hash_new();
 
-And one must free the hash when done with it.
+And one must free the hash when done with it.::
 
-\small 
-\samepage
       scr_hash_delete(&hash);
 
 Given a hash object, you may insert an element, specifying a key and
