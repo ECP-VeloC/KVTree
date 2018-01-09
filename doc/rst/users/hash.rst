@@ -21,28 +21,28 @@ consider the following tree:
 
 \small 
 \samepage
-    +- RANK |br|
-       +- 0 |br|
-       |  +- FILES |br|
-       |  |  +- 2 |br|
-       |  +- FILE |br|
-       |     +- foo_0.txt |br|
-       |     |  +- SIZE |br|
-       |     |  |  +- 1024 |br|
-       |     |  +- COMPLETE |br|
-       |     |     +- 1 |br|
-       |     +- bar_0.txt |br|
-       |        +- SIZE |br|
-       |        |  +- 2048 |br|
-       |        +- COMPLETE |br|
-       |           +- 1 |br|
+    +- RANK 
+       +- 0 
+       .  +- FILES |br|
+       .  .  +- 2 |br|
+       .  +- FILE |br|
+       .     +- foo_0.txt |br|
+       .     .  +- SIZE |br|
+       .     .  .  +- 1024 |br|
+       .     .  +- COMPLETE |br|
+       .     .     +- 1 |br|
+       .     +- bar_0.txt |br|
+       .        +- SIZE |br|
+       .        .  +- 2048 |br|
+       .        +- COMPLETE |br|
+       .           +- 1 |br|
        +- 1 |br|
           +- FILES |br|
-          |  +- 1 |br|
+          .  +- 1 |br|
           +- FILE |br|
              +- foo_1.txt |br|
                 +- SIZE |br|
-                |  +- 3072 |br|
+                .  +- 3072 |br|
                 +- COMPLETE |br|
                    +- 1 |br|
 
