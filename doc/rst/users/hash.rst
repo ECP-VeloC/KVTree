@@ -17,9 +17,7 @@ Throughout the documentation and comments in the source code, a hash is
 often displayed as a tree structure. The key belonging to a hash element
 is shown as a parent node, and the elements in the hash belonging to
 that element are displayed as children of that node. For example,
-consider the following tree:
-
-::
+consider the following tree::
      +- RANK 
        +- 0 
        .  +- FILES |br|
