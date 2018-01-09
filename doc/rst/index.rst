@@ -6,12 +6,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   users/quick.rst
-   users/contact.rst
-   users/intro.rst
-   users/overview.rst
-   users/build.rst
-   users/api.rst
+   users/hash.rst
 
 Indices and tables
 ==================
