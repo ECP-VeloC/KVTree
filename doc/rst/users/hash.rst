@@ -19,32 +19,30 @@ is shown as a parent node, and the elements in the hash belonging to
 that element are displayed as children of that node. For example,
 consider the following tree:
 
-\small 
-\samepage
-    +- RANK 
-       +- 0 
-       .  +- FILES |br|
-       .  .  +- 2 |br|
-       .  +- FILE |br|
-       .     +- foo_0.txt |br|
-       .     .  +- SIZE |br|
-       .     .  .  +- 1024 |br|
-       .     .  +- COMPLETE |br|
-       .     .     +- 1 |br|
-       .     +- bar_0.txt |br|
-       .        +- SIZE |br|
-       .        .  +- 2048 |br|
-       .        +- COMPLETE |br|
-       .           +- 1 |br|
-       +- 1 |br|
-          +- FILES |br|
-          .  +- 1 |br|
-          +- FILE |br|
-             +- foo_1.txt |br|
-                +- SIZE |br|
-                .  +- 3072 |br|
-                +- COMPLETE |br|
-                   +- 1 |br|
+    | +- RANK 
+    |   +- 0 
+    |   .  +- FILES |br|
+    |   .  .  +- 2 |br|
+    |   .  +- FILE |br|
+    |   .     +- foo_0.txt |br|
+    |   .     .  +- SIZE |br|
+    |   .     .  .  +- 1024 |br|
+    |   .     .  +- COMPLETE |br|
+    |   .     .     +- 1 |br|
+    |   .     +- bar_0.txt |br|
+    |   .        +- SIZE |br|
+    |   .        .  +- 2048 |br|
+    |   .        +- COMPLETE |br|
+    |   .           +- 1 |br|
+    |   +- 1 |br|
+    |      +- FILES |br|
+    |      .  +- 1 |br|
+    |      +- FILE |br|
+    |         +- foo_1.txt |br|
+    |            +- SIZE |br|
+    |            .  +- 3072 |br|
+    |            +- COMPLETE |br|
+    |               +- 1 |br|
 
 The above example represents a hash that contains a single element with
 key `RANK`. The hash associated with the `RANK` element contains two
