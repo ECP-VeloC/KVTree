@@ -588,7 +588,6 @@ Binary format
 This section documents the binary format used when serializing a hash.
 
 Packed hash 
-############
 
 A hash can be serialized into a memory buffer for network transfer or
 storage in a file. When serialized, all integers are stored in network
