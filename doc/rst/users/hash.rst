@@ -631,6 +631,5 @@ File Version   uint16_t     Integer field that together with File Type defines t
 File Size      uint64_t     Size of this file in bytes, from first byte of the header to the last byte in the file.
 Flags          uint32_t     Bit flags for file.
 Data           PACKED HASH  Packed hash data 
-One more 
-CRC32          uint32 t     CRC32 of file, accounts for first byte of header to last byte of Data.  (Only exists if SCR FILE FLAGS CRC32 bit is set in Flags.)
+CRC32          uint32_t     CRC32 of file, accounts for first byte of header to last byte of Data.  (Only exists if SCR FILE FLAGS CRC32 bit is set in Flags.)
 ============== ============ ============================================================
