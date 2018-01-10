@@ -3,8 +3,7 @@
 The Key-Value Tree (KVTree) library provides a fully extensible C data
 structure modeled after Perl hashes.
 
-KVTree was originally part of the SCR Library. For now, documentation
-can be found within the SCR library.
+KVTree was originally part of the SCR Library.
 
 ## Quickstart
 
