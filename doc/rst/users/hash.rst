@@ -587,7 +587,7 @@ Binary format
 
 This section documents the binary format used when serializing a hash.
 
-Packed hash {#sec:hash_packed}
+Packed hash 
 ##############################
 
 A hash can be serialized into a memory buffer for network transfer or
