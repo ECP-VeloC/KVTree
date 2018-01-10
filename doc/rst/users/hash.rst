@@ -606,12 +606,12 @@ Elements     PACKED         Sequence of packed elements of length Count.
  
 Format of a PACKED ELEMENT
 
-==========   ===========================    ===============================
+==========   ============================   ===============================
 Field Name   Datatype                       Description
-----------   ----------------------------   ------------------------------
+----------   ----------------------------   -------------------------------
 Key          NULL-terminated ASCII string   Key associated with element
 Hash         PACKED HASH                    Hash associated with element
-==========   ===========================    ===============================
+==========   ============================   ===============================
  
 File format
  
