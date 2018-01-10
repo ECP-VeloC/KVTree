@@ -489,18 +489,18 @@ receive data in advance. As input, a process should provide an empty
 hash for `hash_recv`, and it must structure `hash_send` in the following
 manner.::
 
-      <rank_X>
-        <hash_to_send_to_rank_X>
-     <rank_Y>
-       <hash_to_send_to_rank_Y>
+      rank_X
+         hash_to_send_to_rank_X
+     rank_Y
+         hash_to_send_to_rank_Y
 
 Upon return from the function, `hash_recv` will be filled in according
 to the following format.::
 
-     <rank_A>
-       <hash_received_from_rank_A>
-     <rank_B>
-       <hash_received_from_rank_B>
+     rank_A
+         hash_received_from_rank_A
+     rank_B
+         hash_received_from_rank_B
 
 For example, if `hash_send` was the following on rank 0 before the call::
 
@@ -525,7 +525,7 @@ following on ranks 1 and 2::
           1
         FILE
           foo.txt
-      <... data from other ranks ...>
+      (... data from other ranks ...)
 
       hash_recv on rank 2:
       0
@@ -533,7 +533,7 @@ following on ranks 1 and 2::
           1
         FILE
           bar.txt
-      <... data from other ranks ...>
+      (... data from other ranks ...)
 
 The algorithm used to implement this function assumes the communication
 is sparse, meaning that each process only sends to or receives from a
