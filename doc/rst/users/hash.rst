@@ -171,7 +171,7 @@ from one element to the next.::
 
 This function returns NULL when the current element is the last element.
 Below is some example code that iterates through the elements of hash
-and prints the key for each element:::
+and prints the key for each element::
 
       scr_hash_elem* elem;
       for (elem = scr_hash_elem_first(hash);
@@ -188,7 +188,7 @@ Key/value convenience functions
 Often, it's useful to store a hash using two keys which act like a
 key/value pair. For example, a hash may contain an element with key
 `RANK`, whose hash contains a set of elements with keys corresponding to
-rank ids, where each rank id `0`, `1`, `2`, etc. has a hash, like so:::
+rank ids, where each rank id `0`, `1`, `2`, etc. has a hash, like so::
 
       RANK
         0
@@ -276,7 +276,7 @@ operation results in the following::
 Because it is common to have fields in a hash that should only hold one
 value, there are several utility functions to set and get such fields
 defined in `scr_hash_util.h` and implemented in `scr_hash_util.c`. For
-instance, here are a few functions to set single-value fields:::
+instance, here are a few functions to set single-value fields::
 
       int scr_hash_util_set_bytecount(scr_hash* hash, const char* key, unsigned long count);
       int scr_hash_util_set_crc32(scr_hash* hash, const char* key, uLong crc);
@@ -285,7 +285,7 @@ instance, here are a few functions to set single-value fields:::
 These utility routines unset any existing value before setting the new
 value. They also convert the input value into an appropriate string
 representation. Similarly, there are corresponding get routines, such
-as:::
+as::
 
       int scr_hash_util_get_bytecount(const scr_hash* hash, const char* key, unsigned long* count);
       int scr_hash_util_get_crc32(const scr_hash* hash, const char* key, uLong* crc);
@@ -298,7 +298,7 @@ parameter. Otherwise, the routine does not return `SCR_SUCCESS` and does
 not modify the output parameter.
 
 For example, to set and get the timestep value from the example above,
-one could do the following:::
+one could do the following::
 
       scr_hash_util_set_int64(hash, "TIMESTEP", 21);
 
@@ -502,7 +502,7 @@ to the following format.::
      <rank_B>
        <hash_received_from_rank_B>
 
-For example, if `hash_send` was the following on rank 0 before the call:::
+For example, if `hash_send` was the following on rank 0 before the call::
 
       hash_send on rank 0:
       1
@@ -517,7 +517,7 @@ For example, if `hash_send` was the following on rank 0 before the call:::
           bar.txt
 
 Then after returning from the call, `hash_recv` would contain the
-following on ranks 1 and 2:::
+following on ranks 1 and 2::
 
       hash_recv on rank 1:
       0
@@ -547,7 +547,7 @@ Newer versions of TotalView enable one to dive on hash variables and
 inspect them in a variable window using a tree view. For example, when
 diving on a hash object corresponding to the example hash in the
 overview section, one would see an expanded tree in the variable view
-window like so:::
+window like so::
 
       +- RANK
          +- 0
@@ -618,7 +618,7 @@ File format
 A hash can be serialized and stored as a binary file. This section
 documents the file format for an `scr_hash` object. All integers are
 stored in network byte order (big-endian format). A hash file consists
-of the following sequence of bytes:::
+of the following sequence of bytes::
 
   Field Name     Datatype     Description
   -------------- ------------ -------------------------------------------------------------------------------------------------------------
