@@ -588,37 +588,37 @@ Binary format
 This section documents the binary format used when serializing a hash.
 
 Packed hash 
-##############################
+############
 
 A hash can be serialized into a memory buffer for network transfer or
 storage in a file. When serialized, all integers are stored in network
 byte order (big-endian format). Such a "packed" hash consists of the
 following format:
 
-Format of a PACKED HASH::
-
-  Field Name   Datatype     Description
-  ------------ ------------ ----------------------------------------------
-  Count        `uint32_t`   Number of elements in hash
-                            A count of 0 means the hash is empty.
-  Elements     PACKED       Sequence of packed elements of length Count.
-               ELEMENT      
-
-Format of a PACKED ELEMENT::
-
-  Field Name   Datatype                       Description
-  ------------ ------------------------------ ------------------------------
-  Key          NULL-terminated ASCII string   Key associated with element
-  Hash         PACKED                         Hash associated with element
-               HASH                           
-
-File format
-###########
-
-A hash can be serialized and stored as a binary file. This section
-documents the file format for an `scr_hash` object. All integers are
-stored in network byte order (big-endian format). A hash file consists
-of the following sequence of bytes::
+.. Format of a PACKED HASH::
+.. 
+  .. Field Name   Datatype     Description
+  .. ------------ ------------ ----------------------------------------------
+  .. Count        `uint32_t`   Number of elements in hash
+                            .. A count of 0 means the hash is empty.
+  .. Elements     PACKED       Sequence of packed elements of length Count.
+               .. ELEMENT      
+.. 
+.. Format of a PACKED ELEMENT::
+.. 
+  .. Field Name   Datatype                       Description
+  .. ------------ ------------------------------ ------------------------------
+  .. Key          NULL-terminated ASCII string   Key associated with element
+  .. Hash         PACKED                         Hash associated with element
+               .. HASH                           
+.. 
+.. File format
+.. ###########
+.. 
+.. A hash can be serialized and stored as a binary file. This section
+.. documents the file format for an `scr_hash` object. All integers are
+.. stored in network byte order (big-endian format). A hash file consists
+.. of the following sequence of bytes::
 
   ..Field Name     Datatype     Description
   ..-------------- ------------ -------------------------------------------------------------------------------------------------------------
