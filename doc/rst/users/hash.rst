@@ -618,7 +618,7 @@ File format
 A hash can be serialized and stored as a binary file. This section
 documents the file format for an `scr_hash` object. All integers are
 stored in network byte order (big-endian format). A hash file consists
-of the following sequence of bytes::
+of the following sequence of bytes
 
 ============== ============ ============================================================
 Field Name     Datatype     Description
