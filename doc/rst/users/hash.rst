@@ -96,10 +96,8 @@ And one must free the hash when done with it.::
       scr_hash_delete(&hash);
 
 Given a hash object, you may insert an element, specifying a key and
-another hash as a value.
+another hash as a value.::
 
-\small 
-\samepage
       scr_hash_set(hash, key, value_hash);
 
 If an element already exists for the specified key, this function
@@ -108,40 +106,32 @@ specified hash as the new value. Thus it is not necessary to unset a key
 before setting it -- setting a key simply overwrites the existing value.
 
 You may also perform a lookup by specifying a key and the hash object to
-be searched.
+be searched.::
 
-\small 
-\samepage
       scr_hash* value_hash = scr_hash_get(hash, key);
 
 If the hash has a key by that name, it returns a pointer to the hash
 associated with the key. If the hash does not have an element with the
 specified key, it returns NULL.
 
-You can unset a key.
+You can unset a key.::
 
-\small 
-\samepage
       scr_hash_unset(hash, key);
 
 If a hash value is associated with the specified key, it is freed, and
 then the element is deleted from the hash. It is OK to unset a key even
 if it does not exist in the hash.
 
-To clear a hash (unsets all elements).
+To clear a hash (unsets all elements).::
 
-\small 
-\samepage
       scr_hash_unset_all(hash);
 
-To determine the number of keys in a hash.
+To determine the number of keys in a hash.::
 
-\small 
-\samepage
       int num_elements = scr_hash_size(hash);
 
 To simplify coding, most hash functions accept NULL as a valid input
-hash parameter. It is interpreted as an empty hash. For example,
+hash parameter. It is interpreted as an empty hash. For example,::
 
   ---------------------------------------- -------------------------------
   `scr_hash_delete(NULL);`                 does nothing
@@ -152,48 +142,37 @@ hash parameter. It is interpreted as an empty hash. For example,
   `scr_hash_size(NULL);`                   returns 0
   ---------------------------------------- -------------------------------
 
-### Accessing and iterating over hash elements
+Accessing and iterating over hash elements
+##########################################
 
 At times, one needs to work with individual hash elements. To get a
 pointer to the element associated with a key (instead of a pointer to
-the hash belonging to that element).
+the hash belonging to that element).::
 
-\small 
-\samepage
       scr_hash_elem* elem = scr_hash_elem_get(hash, key);
 
-To get the key associated with an element.
+To get the key associated with an element.::
 
-\small 
-\samepage
       char* key = scr_hash_elem_key(elem);
 
-To get the hash associated with an element.
+To get the hash associated with an element.::
 
-\small 
-\samepage
       scr_hash* hash = scr_hash_elem_hash(elem);
 
 It's possible to iterate through the elements of a hash. First, you need
-to get a pointer to the first element.
+to get a pointer to the first element.::
 
-\small 
-\samepage
       scr_hash_elem* elem = scr_hash_elem_first(hash);
 
 This function returns NULL if the hash has no elements. Then, to advance
-from one element to the next.
+from one element to the next.::
 
-\small 
-\samepage
       scr_hash_elem* next_elem = scr_hash_elem_next(elem);
 
 This function returns NULL when the current element is the last element.
 Below is some example code that iterates through the elements of hash
-and prints the key for each element:
+and prints the key for each element:::
 
-\small 
-\samepage
       scr_hash_elem* elem;
       for (elem = scr_hash_elem_first(hash);
            elem != NULL;
@@ -203,15 +182,14 @@ and prints the key for each element:
         printf("%s\n", key);
       }
 
-### Key/value convenience functions
+Key/value convenience functions
+###############################
 
 Often, it's useful to store a hash using two keys which act like a
 key/value pair. For example, a hash may contain an element with key
 `RANK`, whose hash contains a set of elements with keys corresponding to
-rank ids, where each rank id `0`, `1`, `2`, etc. has a hash, like so:
+rank ids, where each rank id `0`, `1`, `2`, etc. has a hash, like so:::
 
-\small 
-\samepage
       RANK
         0
           <hash for rank 0>
@@ -222,10 +200,8 @@ rank ids, where each rank id `0`, `1`, `2`, etc. has a hash, like so:
 
 This case comes up so frequently that there are special key/value (\_kv)
 functions to make this operation easier. For example, to access the hash
-for rank 0 in the above example, one may call
+for rank 0 in the above example, one may call::
 
-\small 
-\samepage
       scr_hash* rank_0_hash = scr_hash_get_kv(hash, "RANK", "0");
 
 This searches for the `RANK` element in the specified hash. If found, it
@@ -237,10 +213,8 @@ element, this function returns NULL.
 The following function behaves similarly to `scr_hash_get_kv` -- it
 returns the hash for rank 0 if it exists. It differs in that it creates
 and inserts hashes and elements as needed such that an empty hash is
-created for rank 0 if it does not already exist.
+created for rank 0 if it does not already exist.::
 
-\small 
-\samepage
       scr_hash* rank_0_hash = scr_hash_set_kv(hash, "RANK", "0");
 
 This function creates a `RANK` element if it does not exist in the
@@ -250,10 +224,8 @@ which will be an empty hash if the `0` element was created by the call.
 This feature lets one string together multiple calls without requiring
 lots of conditional code to check whether certain elements already
 exist. For example, the following code is valid whether or not `hash`
-has a `RANK` element.
+has a `RANK` element.::
 
-\small 
-\samepage
       scr_hash* rank_hash = scr_hash_set_kv(hash,      "RANK", "0");
       scr_hash* ckpt_hash = scr_hash_set_kv(rank_hash, "CKPT", "10");
       scr_hash* file_hash = scr_hash_set_kv(ckpt_hash, "FILE", "3");
@@ -261,18 +233,14 @@ has a `RANK` element.
 Often, as in the case above, the *value* key is an integer. In order to
 avoid requiring the caller to convert integers to strings, there are
 functions to handle the value argument as an `int` type, e.g, the above
-segment could be written as
+segment could be written as::
 
-\small 
-\samepage
       scr_hash* rank_hash = scr_hash_set_kv_int(hash,      "RANK",  0);
       scr_hash* ckpt_hash = scr_hash_set_kv_int(rank_hash, "CKPT", 10);
       scr_hash* file_hash = scr_hash_set_kv_int(ckpt_hash, "FILE",  3);
 
-It's also possible to unset key/value pairs.
+It's also possible to unset key/value pairs.::
 
-\small 
-\samepage
       scr_hash_unset_kv(hash, "RANK", "0");
 
 This call removes the `0` element from the `RANK` hash if one exists. If
@@ -283,32 +251,24 @@ In some cases, one wants to associate a single value with a given key.
 When attempting to change the value in such cases, it is necessary to
 first unset a key before setting the new value. Simply setting a new
 value will insert another element under the key. For instance, consider
-that one starts with the following hash
+that one starts with the following hash::
 
-\small 
-\samepage
       TIMESTEP
         20
 
-If the goal is to modify this hash such that it changes to
+If the goal is to modify this hash such that it changes to::
 
-\small 
-\samepage
       TIMESTEP
         21
 
-then one should do the following
+then one should do the following::
 
-\small 
-\samepage
       scr_hash_unset(hash, "TIMESTEP");
       scr_hash_set_kv_int(hash, "TIMESTEP", 21);
 
 Simply executing the set operation without first executing the unset
-operation results in the following
+operation results in the following::
 
-\small 
-\samepage
       TIMESTEP
         20
         21
@@ -316,10 +276,8 @@ operation results in the following
 Because it is common to have fields in a hash that should only hold one
 value, there are several utility functions to set and get such fields
 defined in `scr_hash_util.h` and implemented in `scr_hash_util.c`. For
-instance, here are a few functions to set single-value fields:
+instance, here are a few functions to set single-value fields:::
 
-\small 
-\samepage
       int scr_hash_util_set_bytecount(scr_hash* hash, const char* key, unsigned long count);
       int scr_hash_util_set_crc32(scr_hash* hash, const char* key, uLong crc);
       int scr_hash_util_set_int64(scr_hash* hash, const char* key, int64_t value);
@@ -327,10 +285,8 @@ instance, here are a few functions to set single-value fields:
 These utility routines unset any existing value before setting the new
 value. They also convert the input value into an appropriate string
 representation. Similarly, there are corresponding get routines, such
-as:
+as:::
 
-\small 
-\samepage
       int scr_hash_util_get_bytecount(const scr_hash* hash, const char* key, unsigned long* count);
       int scr_hash_util_get_crc32(const scr_hash* hash, const char* key, uLong* crc);
       int scr_hash_util_get_int64(const scr_hash* hash, const char* key, int64_T* value);
@@ -342,10 +298,8 @@ parameter. Otherwise, the routine does not return `SCR_SUCCESS` and does
 not modify the output parameter.
 
 For example, to set and get the timestep value from the example above,
-one could do the following:
+one could do the following:::
 
-\small 
-\samepage
       scr_hash_util_set_int64(hash, "TIMESTEP", 21);
 
       int64_t current_timestep = -1;
@@ -360,22 +314,19 @@ functions is that the key/value functions are used to set and get a hash
 that is referenced by a key/value pair whereas the utility functions set
 and get a scalar value that has no associated hash.
 
-### Specifying multiple keys with format functions
+Specifying multiple keys with format functions
+##############################################
 
 One can set many keys in a single call using a printf-like statement.
 This call converts variables like floats, doubles, and longs into
 strings. It enables one to set multiple levels of keys in a single call,
 and it enables one to specify the hash value to associate with the last
-element.
+element.::
 
-\small 
-\samepage
       scr_hash_setf(hash, value_hash, "format", variables ...);
 
-For example, if one had a hash like the following
+For example, if one had a hash like the following::
 
-\small 
-\samepage
       RANK
         0
           CKPT
@@ -383,28 +334,23 @@ For example, if one had a hash like the following
               <current_hash>
 
 One could overwrite the hash associated with the `10` element in a
-single call like so.
+single call like so.::
 
-\small 
-\samepage
       scr_hash_setf(hash, new_hash, "%s %d %s %d", "RANK", 0, "CKPT", 10);
 
 Different keys are separated by single spaces in the format string. Only
 a subset of the printf format strings are supported.
 
-There is also a corresponding getf version.
+There is also a corresponding getf version.::
 
-\small 
-\samepage
       scr_hash* hash = scr_hash_getf(hash, "%s %d %s %d", "RANK", 0, "CKPT", 10);
 
-### Sorting hash keys
+Sorting hash keys
+#################
 
 Generally, the keys in a hash are not ordered. However, one may order
-the keys with the following sort routines.
+the keys with the following sort routines.::
 
-\small 
-\samepage
       scr_hash_sort(hash, direction);
       scr_hash_sort_int(hash, direction);
 
@@ -414,12 +360,11 @@ integer values. The direction variable may be either
 in sorted order until new keys are added. The order is not kept between
 packing and unpacking hashes.
 
-### Listing hash keys
+Listing hash keys
+#################
 
-One may get a sorted list of all keys in a hash.
+One may get a sorted list of all keys in a hash.::
 
-\small 
-\samepage
       int num_keys;
       int* keys;
       scr_hash_list_int(hash, &num_keys, &keys);
@@ -433,48 +378,40 @@ The caller is responsible for freeing this memory. Currently, one may
 only get a list of keys that can be represented as integers. There is no
 such list routine for arbitrary key strings.
 
-### Packing and unpacking hashes
+Packing and unpacking hashes
+############################
 
 A hash can be serialized into a memory buffer for network transfer or
 storage in a file. To determine the size of a buffer needed to pack a
-hash.
+hash.::
 
-\small 
-\samepage
       int num_bytes = scr_hash_pack_size(hash);
 
-To pack a hash into a buffer.
+To pack a hash into a buffer.::
 
-\small 
-\samepage
       scr_hash_pack(buf, hash);
 
-To unpack a hash from a buffer into a given hash object.
+To unpack a hash from a buffer into a given hash object.::
 
-\small 
-\samepage
       scr_hash* hash = scr_hash_new();
       scr_hash_unpack(buf, hash);
 
 One must pass an empty hash to the unpack function.
 
-### Hash files
+Hash files
+##########
 
 Hashes may be serialized to a file and restored from a file. To write a
-hash to a file.
+hash to a file.::
 
-\small 
-\samepage
       scr_hash_file_write(filename, hash);
 
 This call creates the file if it does not exist, and it overwrites any
 existing file.
 
 To read a hash from a file (merges hash from file into given hash
-object).
+object).::
 
-\small 
-\samepage
       scr_hash_file_read(filename, hash);
 
 Many hash files are written and read by more than one process. In this
@@ -482,50 +419,41 @@ case, locks can be used to ensure that only one process has access to
 the file at a time. A process blocks while waiting on the lock. The
 following call blocks the calling process until it obtains a lock on the
 file. Then it opens, reads, closes, and unlocks the file. This results
-in an atomic read among processes using the file lock.
+in an atomic read among processes using the file lock.::
 
-\small 
-\samepage
       scr_hash_read_with_lock(filename, hash)
 
 To update a locked file, it is often necessary to execute a
 read-modify-write operation. For this there are two functions. One
-function locks, opens, and reads a file.
+function locks, opens, and reads a file.::
 
-\small 
-\samepage
       scr_hash_lock_open_read(filename, &fd, hash)
 
 The opened file descriptor is returned, and the contents of the file are
 read (merged) in to the specified hash object. The second function
-writes, closes, and unlocks the file.
+writes, closes, and unlocks the file.::
 
-\small 
-\samepage
       scr_hash_write_close_unlock(filename, &fd, hash)
 
 One must pass the filename, the opened file descriptor, and the hash to
 be written to the file.
 
-### Sending and receiving hashes
+Sending and receiving hashes
+############################
 
 There are several functions to exchange hashes between MPI processes.
 While most hash functions are implemented in `scr_hash.c`, the functions
 dependent on MPI are implemented in `scr_hash_mpi.c`. This is done so
 that serial programs can use hashes without having to link to MPI.
 
-To send a hash to another MPI process.
+To send a hash to another MPI process.::
 
-\small 
-\samepage
       scr_hash_send(hash, rank, comm)
 
 This call executes a blocking send to transfer a copy of the specified
 hash to the specified destination rank in the given MPI communicator.
-Similarly, to receive a copy of a hash.
+Similarly, to receive a copy of a hash.::
 
-\small 
-\samepage
       scr_hash_recv(hash, rank, comm)
 
 This call blocks until it receives a hash from the specified rank, and
@@ -533,20 +461,16 @@ then it unpacks the received hash into `hash` and returns.
 
 There is also a function to simultaneously send and receive hashes,
 which is useful to avoid worrying about ordering issues in cases where a
-process must both send and receive a hash.
+process must both send and receive a hash.::
 
-\small 
-\samepage
       scr_hash_sendrecv(hash_send, rank_send, hash_recv, rank_recv, comm)
 
 The caller provides the hash to be sent and the rank it should be sent
 to, along with a hash to unpack the received into and the rank it should
 receive from, as well as, the communicator to be used.
 
-A process may broadcast a hash to all ranks in a communicator.
+A process may broadcast a hash to all ranks in a communicator.::
 
-\small 
-\samepage
       scr_hash_bcast(hash, root, comm)
 
 As with MPI, all processes must specify the same root and communicator.
@@ -554,10 +478,8 @@ The root process specifies the hash to be broadcast, and each non-root
 process provides a hash into which the broadcasted hash is unpacked.
 
 Finally, there is a call used to issue a (sparse) global exchange of
-hashes, which is similar to an `MPI_Alltoallv` call.
+hashes, which is similar to an `MPI_Alltoallv` call.::
 
-\small 
-\samepage
       scr_hash_exchange(hash_send, hash_recv, comm)
 
 This is a collective call which enables any process in `comm` to send a
@@ -565,29 +487,23 @@ hash to any other process in `comm` (including itself). Furthermore, the
 destination processes do not need to know from which processes they will
 receive data in advance. As input, a process should provide an empty
 hash for `hash_recv`, and it must structure `hash_send` in the following
-manner.
+manner.::
 
-\small 
-\samepage
       <rank_X>
         <hash_to_send_to_rank_X>
      <rank_Y>
        <hash_to_send_to_rank_Y>
 
 Upon return from the function, `hash_recv` will be filled in according
-to the following format.
+to the following format.::
 
-\small 
-\samepage
      <rank_A>
        <hash_received_from_rank_A>
      <rank_B>
        <hash_received_from_rank_B>
 
-For example, if `hash_send` was the following on rank 0 before the call:
+For example, if `hash_send` was the following on rank 0 before the call:::
 
-\small 
-\samepage
       hash_send on rank 0:
       1
         FILES
@@ -601,10 +517,8 @@ For example, if `hash_send` was the following on rank 0 before the call:
           bar.txt
 
 Then after returning from the call, `hash_recv` would contain the
-following on ranks 1 and 2:
+following on ranks 1 and 2:::
 
-\small 
-\samepage
       hash_recv on rank 1:
       0
         FILES
@@ -633,10 +547,8 @@ Newer versions of TotalView enable one to dive on hash variables and
 inspect them in a variable window using a tree view. For example, when
 diving on a hash object corresponding to the example hash in the
 overview section, one would see an expanded tree in the variable view
-window like so:
+window like so:::
 
-\small 
-\samepage
       +- RANK
          +- 0
          |  +- FILES = 2
@@ -660,18 +572,14 @@ value pair.
 
 If TotalView is not available, one may resort to printing a hash to
 `stdout` using the following function. The number of spaces to indent
-each level is specified in the second parameter.
+each level is specified in the second parameter.::
 
-\small 
-\samepage
       scr_hash_print(hash, indent);
 
 To view the contents of a hash file, there is a utility called
 `scr_print_hash_file` which reads a file and prints the contents to the
-screen.
+screen.::
 
-\small 
-\samepage
       scr_print_hash_file  myhashfile.scr
 
 Binary format
@@ -679,14 +587,15 @@ Binary format
 
 This section documents the binary format used when serializing a hash.
 
-### Packed hash {#sec:hash_packed}
+Packed hash {#sec:hash_packed}
+##############################
 
 A hash can be serialized into a memory buffer for network transfer or
 storage in a file. When serialized, all integers are stored in network
 byte order (big-endian format). Such a "packed" hash consists of the
 following format:
 
-Format of a PACKED HASH:\
+Format of a PACKED HASH::
 
   Field Name   Datatype     Description
   ------------ ------------ ----------------------------------------------
@@ -695,7 +604,7 @@ Format of a PACKED HASH:\
   Elements     PACKED       Sequence of packed elements of length Count.
                ELEMENT      
 
-Format of a PACKED ELEMENT:\
+Format of a PACKED ELEMENT::
 
   Field Name   Datatype                       Description
   ------------ ------------------------------ ------------------------------
@@ -703,12 +612,13 @@ Format of a PACKED ELEMENT:\
   Hash         PACKED                         Hash associated with element
                HASH                           
 
-### File format
+File format
+###########
 
 A hash can be serialized and stored as a binary file. This section
 documents the file format for an `scr_hash` object. All integers are
 stored in network byte order (big-endian format). A hash file consists
-of the following sequence of bytes:
+of the following sequence of bytes:::
 
   Field Name     Datatype     Description
   -------------- ------------ -------------------------------------------------------------------------------------------------------------
