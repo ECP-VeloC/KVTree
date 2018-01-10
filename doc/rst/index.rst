@@ -7,7 +7,9 @@ Contents:
    :maxdepth: 2
 
    users/overview.rst
-   users/hash.rst
+   users/api.rst
+   users/debugging.rst
+   users/fileformat.rst
 
 Indices and tables
 ==================
