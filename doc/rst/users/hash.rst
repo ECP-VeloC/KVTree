@@ -594,14 +594,15 @@ storage in a file. When serialized, all integers are stored in network
 byte order (big-endian format). Such a "packed" hash consists of the
 following format:
 
-Format of a PACKED HASH::
+Format of a PACKED HASH
  
-   Field Name   Datatype     Description
-   ------------ ------------ ----------------------------------------------
-   Count        `uint32_t`   Number of elements in hash
-                             A count of 0 means the hash is empty.
-   Elements     PACKED       Sequence of packed elements of length Count.
-                ELEMENT      
+==========   ========     ===============================================
+Field Name   Datatype     Description
+------------ ----------   -----------------------------------------------
+Count        `uint32_t`   Number of elements in hash. A count of 0 means the hash is empty.
+Elements     PACKED       Sequence of packed elements of length Count.
+             ELEMENT   
+==========   =========    ===============================================
  
 Format of a PACKED ELEMENT::
  
