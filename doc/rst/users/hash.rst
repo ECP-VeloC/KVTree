@@ -599,8 +599,7 @@ Format of a PACKED HASH
 ==========   ==========     ===============================================
 Field Name   Datatype       Description
 ----------   ----------     -----------------------------------------------
-Count        `uint32_t`     Number of elements in hash. A count of 0 means 
-                               the hash is empty.
+Count        uint32_t       Number of elements in hash. A count of 0 means the hash is empty.
 Elements     PACKED         Sequence of packed elements of length Count.
              ELEMENT   
 ==========   ==========     ===============================================
