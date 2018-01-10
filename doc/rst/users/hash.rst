@@ -612,7 +612,6 @@ Format of a PACKED ELEMENT::
                 HASH                           
  
 File format
-###########
  
 A hash can be serialized and stored as a binary file. This section
 documents the file format for an `scr_hash` object. All integers are
