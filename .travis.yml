@@ -5,7 +5,7 @@ script:
   - cd build
   - cmake .. -DMPI=OFF
   - make
-  - make install
+  - make test
 
 
 
