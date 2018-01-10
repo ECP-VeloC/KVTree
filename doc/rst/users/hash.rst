@@ -588,6 +588,7 @@ Binary format
 This section documents the binary format used when serializing a hash.
 
 Packed hash 
+###########
 
 A hash can be serialized into a memory buffer for network transfer or
 storage in a file. When serialized, all integers are stored in network
@@ -614,6 +615,7 @@ Hash         PACKED HASH                    Hash associated with element
 ==========   ============================   ===============================
  
 File format
+###########
  
 A hash can be serialized and stored as a binary file. This section
 documents the file format for an `scr_hash` object. All integers are
