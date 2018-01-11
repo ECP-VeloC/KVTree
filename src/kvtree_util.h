@@ -36,6 +36,8 @@ int kvtree_util_set_int64(kvtree* hash, const char* key, int64_t value);
 
 int kvtree_util_set_double(kvtree* hash, const char* key, double value);
 
+int kvtree_util_set_ptr(kvtree* hash, const char* key, void* ptr);
+
 /* the get functions all return KVTREE_FAILURE if any of the following hold:
  *   the input hash or the key is NULL
  *   the hash has no entry for the specified key
@@ -56,5 +58,7 @@ int kvtree_util_get_str(const kvtree* hash, const char* key, char** value);
 int kvtree_util_get_int64(const kvtree* hash, const char* key, int64_t* value);
 
 int kvtree_util_get_double(const kvtree* hash, const char* key, double* value);
+
+int kvtree_util_get_ptr(const kvtree* hash, const char* key, void** value);
 
 #endif
