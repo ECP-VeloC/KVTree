@@ -340,6 +340,8 @@ kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
       size = snprintf(key, sizeof(key), token, va_arg(args, unsigned long long));
     } else if (strcmp(token, "%f") == 0) {
       size = snprintf(key, sizeof(key), token, va_arg(args, double));
+    } else if (strcmp(token, "%p") == 0) {
+      size = snprintf(key, sizeof(key), token, va_arg(args, void*));
     } else {
       kvtree_abort(-1, "Unsupported hash key format '%s' @ %s:%d",
         token, __FILE__, __LINE__
@@ -452,6 +454,8 @@ kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
       size = snprintf(key, sizeof(key), token, va_arg(args, unsigned long long));
     } else if (strcmp(token, "%f") == 0) {
       size = snprintf(key, sizeof(key), token, va_arg(args, double));
+    } else if (strcmp(token, "%p") == 0) {
+      size = snprintf(key, sizeof(key), token, va_arg(args, void*));
     } else {
       kvtree_abort(-1, "Unsupported hash key format '%s' @ %s:%d",
         token, __FILE__, __LINE__
