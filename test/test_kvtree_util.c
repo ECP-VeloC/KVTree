@@ -116,6 +116,23 @@ int test_kvtree_util_set_get_double(){
   return rc;
 }
 
+int test_kvtree_util_set_get_ptr(){
+  int rc = TEST_PASS;
+  char* key = "KEY";
+  void* value = (void*) &rc; /* any memory pointer will do, just use address of rc */
+  void* roundtrip = NULL;
+
+  kvtree* kvtree = kvtree_new();
+
+  if(kvtree == NULL) rc = TEST_FAIL;
+  if(kvtree_util_set_ptr(kvtree, key, value) != KVTREE_SUCCESS) rc = TEST_FAIL;
+  if(kvtree_util_get_ptr(kvtree, key, &roundtrip) != KVTREE_SUCCESS) rc = TEST_FAIL;
+  if(roundtrip != value) rc = TEST_FAIL;
+
+  kvtree_delete(&kvtree);
+  return rc;
+}
+
 void test_kvtree_util_init(){
   register_test(test_kvtree_util_set_get_bytecount, "test_kvtree_util_set_get_bytecount");
   register_test(test_kvtree_util_set_get_int, "test_kvtree_util_set_get_int");
@@ -123,4 +140,5 @@ void test_kvtree_util_init(){
   register_test(test_kvtree_util_set_get_unsigned_long, "test_kvtree_util_set_get_unsigned_long");
   register_test(test_kvtree_util_set_get_int64, "test_kvtree_util_set_get_int64");
   register_test(test_kvtree_util_set_get_double, "test_kvtree_util_set_get_double");
+  register_test(test_kvtree_util_set_get_ptr, "test_kvtree_util_set_get_ptr");
 }

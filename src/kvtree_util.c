@@ -101,6 +101,17 @@ int kvtree_util_set_double(kvtree* hash, const char* key, double value)
   return KVTREE_SUCCESS;
 }
 
+int kvtree_util_set_ptr(kvtree* hash, const char* key, void* value)
+{
+  /* first, unset any current setting */
+  kvtree_unset(hash, key);
+
+  /* then set the new value */
+  kvtree_setf(hash, NULL, "%s %p", key, value);
+
+  return KVTREE_SUCCESS;
+}
+
 int kvtree_util_get_bytecount(const kvtree* hash, const char* key, unsigned long* val)
 {
   int rc = KVTREE_FAILURE;
@@ -199,6 +210,25 @@ int kvtree_util_get_double(const kvtree* hash, const char* key, double* val)
     /* convert the key string */
     double val_tmp;
     if (kvtree_atod(val_str, &val_tmp) == KVTREE_SUCCESS) {
+      *val = val_tmp;
+      rc = KVTREE_SUCCESS;
+    }
+  }
+
+  return rc;
+}
+
+int kvtree_util_get_ptr(const kvtree* hash, const char* key, void** val)
+{
+  int rc = KVTREE_FAILURE;
+
+  /* check whether this key is even set */
+  char* val_str = kvtree_get_val(hash, key);
+  if (val_str != NULL) {
+    /* convert the key string */
+    void* val_tmp;
+    int sscanf_rc = sscanf(val_str, "%p", &val_tmp);
+    if (sscanf_rc == 1) {
       *val = val_tmp;
       rc = KVTREE_SUCCESS;
     }
