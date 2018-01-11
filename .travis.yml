@@ -1,0 +1,11 @@
+langauge: c
+
+script:
+  - mkdir build
+  - cd build
+  - cmake .. -DMPI=OFF
+  - make
+  - make test
+
+
+
