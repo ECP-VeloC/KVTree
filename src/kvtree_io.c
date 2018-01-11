@@ -53,7 +53,7 @@ open/lock/close/read/write functions
 =========================================
 */
 
-/* returns user's current mode as determine by his umask */
+/* returns user's current mode as determined by their umask */
 mode_t kvtree_getmode(int read, int write, int execute)
 {
   /* lookup current mask and set it back */
