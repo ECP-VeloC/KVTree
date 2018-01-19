@@ -3,9 +3,9 @@ langauge: c
 script:
   - mkdir build
   - cd build
-  - cmake .. -DMPI=OFF
+  - cmake .. -DMPI=OFF -DCMAKE_C_FLAGS="-coverage"
   - make
   - make check
 
-
-
+after_success:
+#  - bash <(curl -s https://codecov.io/bash) ; fi
