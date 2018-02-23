@@ -1,12 +1,16 @@
 /*
- * Copyright (c) 2009, Lawrence Livermore National Security, LLC.
- * Produced at the Lawrence Livermore National Laboratory.
- * Written by Adam Moody <moody20@llnl.gov>.
- * LLNL-CODE-411039.
- * All rights reserved.
- * This file was originally part of The Scalable Checkpoint / Restart (SCR) library.
- * For details, see https://sourceforge.net/projects/scalablecr/
- * Please also read this file: LICENSE.TXT.
+* Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+* Produced at the Lawrence Livermore National Laboratory.
+*
+* Copyright (c) 2018, UChicago Argonne LLC,
+*   operator of Argonne National Laboratory
+*
+* LLNL-CODE-745961
+* All rights reserved.
+*
+* This is the license for KVTree.
+* For details, see https://github.com/LLNL/KVTree
+* Please read the LICENSE file for full license text.
 */
 
 /* Defines a recursive hash data structure, where at the top level,
@@ -80,7 +84,7 @@ int kvtree_recv(kvtree* hash, int rank, MPI_Comm comm)
   int size;
   MPI_Status status;
   MPI_Recv(&size, 1, MPI_INT, rank, 0, comm, &status);
-  
+
   /* receive the hash and unpack it */
   if (size > 0) {
     /* allocate a buffer big enough to receive the packed hash */
@@ -214,7 +218,7 @@ int kvtree_bcast(kvtree* hash, int root, MPI_Comm comm)
     /* get the size of the incoming hash */
     int size;
     MPI_Bcast(&size, 1, MPI_INT, root, comm);
-  
+
     /* receive the hash and unpack it */
     if (size > 0) {
       /* allocate a buffer big enough to receive the packed hash */
@@ -230,7 +234,7 @@ int kvtree_bcast(kvtree* hash, int root, MPI_Comm comm)
 }
 
 /* execute a (sparse) global exchange, similar to an alltoallv operation
- * 
+ *
  * hash_send specifies destinations as:
  * <rank_X>
  *   <hash_to_send_to_rank_X>
@@ -375,7 +379,7 @@ static int kvtree_exchange_direction_hops(
 }
 
 /* execute a (sparse) global exchange, similar to an alltoallv operation
- * 
+ *
  * hash_send specifies destinations as:
  * <rank_X>
  *   <hash_to_send_to_rank_X>
