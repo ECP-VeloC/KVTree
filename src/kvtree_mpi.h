@@ -1,12 +1,16 @@
 /*
- * Copyright (c) 2009, Lawrence Livermore National Security, LLC.
- * Produced at the Lawrence Livermore National Laboratory.
- * Written by Adam Moody <moody20@llnl.gov>.
- * LLNL-CODE-411039.
- * All rights reserved.
- * This file was originally part of The Scalable Checkpoint / Restart (SCR) library.
- * For details, see https://sourceforge.net/projects/scalablecr/
- * Please also read this file: LICENSE.TXT.
+* Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+* Produced at the Lawrence Livermore National Laboratory.
+*
+* Copyright (c) 2018, UChicago Argonne LLC,
+*   operator of Argonne National Laboratory
+*
+* LLNL-CODE-745961
+* All rights reserved.
+*
+* This is the license for KVTree.
+* For details, see https://github.com/LLNL/KVTree
+* Please read the LICENSE file for full license text.
 */
 
 #ifndef KVTREE_MPI_H
@@ -38,7 +42,7 @@ int kvtree_sendrecv(
 int kvtree_bcast(kvtree* hash, int root, MPI_Comm comm);
 
 /* execute a (sparse) global exchange, similar to an alltoallv operation
- * 
+ *
  * hash_send specifies destinations as:
  * <rank_X>
  *   <hash_to_send_to_rank_X>
