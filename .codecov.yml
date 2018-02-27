@@ -1,0 +1,15 @@
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default: true
+      src:
+        threshold: 0.5
+        paths:
+          - src
+
+ignore:
+  docs/*
+  cmake/*
+  test/*
