@@ -1,11 +1,17 @@
 langauge: c
 
+install:
+  - pip install --upgrade pip
+  - pip install --upgrade codecov
+
 script:
   - mkdir build
   - cd build
   - cmake .. -DMPI=OFF -DCMAKE_C_FLAGS="-coverage"
   - make
   - make check
+  - codecov --required
 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
+
+#after_success:
+#  - bash <(curl -s https://codecov.io/bash)
