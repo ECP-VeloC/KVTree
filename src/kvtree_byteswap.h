@@ -1,3 +1,18 @@
+/*
+* Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+* Produced at the Lawrence Livermore National Laboratory.
+*
+* Copyright (c) 2018, UChicago Argonne LLC,
+*   operator of Argonne National Laboratory
+*
+* LLNL-CODE-745961
+* All rights reserved.
+*
+* This is the license for KVTree.
+* For details, see https://github.com/LLNL/KVTree
+* Please read the LICENSE file for full license text.
+*/
+
 /* Macros to swap the order of bytes in integer values.
    Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
    Free Software Foundation, Inc.

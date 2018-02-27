@@ -1,12 +1,16 @@
 /*
- * Copyright (c) 2009, Lawrence Livermore National Security, LLC.
- * Produced at the Lawrence Livermore National Laboratory.
- * Written by Adam Moody <moody20@llnl.gov>.
- * LLNL-CODE-411039.
- * All rights reserved.
- * This file was originally part of The Scalable Checkpoint / Restart (SCR) library.
- * For details, see https://sourceforge.net/projects/scalablecr/
- * Please also read this file: LICENSE.TXT.
+* Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+* Produced at the Lawrence Livermore National Laboratory.
+*
+* Copyright (c) 2018, UChicago Argonne LLC,
+*   operator of Argonne National Laboratory
+*
+* LLNL-CODE-745961
+* All rights reserved.
+*
+* This is the license for KVTree.
+* For details, see https://github.com/LLNL/KVTree
+* Please read the LICENSE file for full license text.
 */
 
 /* Several lines are reproduced from queue.h, under the following license */
@@ -55,10 +59,10 @@ where each element contains a key (char string)
 and a pointer to another hash.
 =========================================
 */
-#define KVTREE_MAJOR "0"
+#define KVTREE_MAJOR "1"
 #define KVTREE_MINOR "0"
-#define KVTREE_PATCH "1"
-#define KVTREE_VERSION "0.0.1"
+#define KVTREE_PATCH "0"
+#define KVTREE_VERSION "1.0.0"
 #define KVTREE_SUCCESS (0)
 #define KVTREE_MAX_FILENAME (1024)
 

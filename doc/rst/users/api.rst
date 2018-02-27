@@ -1,3 +1,16 @@
+.. # Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+.. # Produced at the Lawrence Livermore National Laboratory.
+.. #
+.. # Copyright (c) 2018, UChicago Argonne LLC,
+.. #   operator of Argonne National Laboratory
+.. #
+.. # LLNL-CODE-745961
+.. # All rights reserved.
+.. #
+.. # This is the license for KVTree.
+.. # For details, see https://github.com/LLNL/KVTree
+.. # Please read the LICENSE file for full license text.
+
 KVTree API
 ==========
 
@@ -460,4 +473,3 @@ The algorithm used to implement this function assumes the communication
 is sparse, meaning that each process only sends to or receives from a
 small number of other processes. It may also be used for gather or
 scatter operations.
-

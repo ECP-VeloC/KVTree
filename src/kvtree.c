@@ -1,12 +1,16 @@
 /*
- * Copyright (c) 2009, Lawrence Livermore National Security, LLC.
- * Produced at the Lawrence Livermore National Laboratory.
- * Written by Adam Moody <moody20@llnl.gov>.
- * LLNL-CODE-411039.
- * All rights reserved.
- * This file was originally part of The Scalable Checkpoint / Restart (SCR) library.
- * For details, see https://sourceforge.net/projects/scalablecr/
- * Please also read this file: LICENSE.TXT.
+* Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+* Produced at the Lawrence Livermore National Laboratory.
+*
+* Copyright (c) 2018, UChicago Argonne LLC,
+*   operator of Argonne National Laboratory
+*
+* LLNL-CODE-745961
+* All rights reserved.
+*
+* This is the license for KVTree.
+* For details, see https://github.com/LLNL/KVTree
+* Please read the LICENSE file for full license text.
 */
 
 /* Defines a recursive hash data structure, where at the top level,
