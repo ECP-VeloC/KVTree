@@ -35,7 +35,9 @@ Some useful CMake command line options:
 
 ## Authors
 
-KVTree is part of the SCR project
+KVTree is part of the VeloC project
+
+KVTree code is originally from the SCR project
 
 Numerous people have [contributed](https://github.com/llnl/scr/graphs/contributors) to the SCR project.
 
