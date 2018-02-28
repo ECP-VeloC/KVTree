@@ -1,6 +1,6 @@
 langauge: c
 
-#install:
+install:
   - pip install pip
   - pip install codecov
 
