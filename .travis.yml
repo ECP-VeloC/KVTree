@@ -8,4 +8,4 @@ script:
   - make check
 
 after_success:
-#  - bash <(curl -s https://codecov.io/bash) ; fi
+  - bash <(curl -s https://codecov.io/bash) ; fi
