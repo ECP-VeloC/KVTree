@@ -6,6 +6,8 @@ script:
   - cmake .. -DMPI=OFF -DCMAKE_C_FLAGS="-coverage"
   - make
   - make check
+#  - codecov --required
 
-after_success:
-#  - bash <(curl -s https://codecov.io/bash) ; fi
+
+#after_success:
+#  - bash <(curl -s https://codecov.io/bash)

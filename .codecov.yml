@@ -1,0 +1,20 @@
+codecov:
+  notify:
+    require_ci_to_pass: yes
+
+coverage:
+  precision: 2
+  round: down
+  status:
+    project:
+      default: true
+      src:
+        paths:
+          - src
+
+ignore:
+  docs/*
+  cmake/*
+  test/*
+
+comment: off
