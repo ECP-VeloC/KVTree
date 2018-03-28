@@ -1,16 +1,12 @@
 langauge: c
 
-install:
-  - pip install pip
-  - pip install codecov
-
 script:
   - mkdir build
   - cd build
   - cmake .. -DMPI=OFF -DCMAKE_C_FLAGS="-coverage"
   - make
   - make check
-  - codecov --required
+#  - codecov --required
 
 
 #after_success:
