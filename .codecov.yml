@@ -1,3 +1,7 @@
+codecov:
+  notify:
+    require_ci_to_pass: yes
+
 coverage:
   precision: 2
   round: down
@@ -5,8 +9,6 @@ coverage:
     project:
       default: true
       src:
-        target: 0.5
-        threshold: 0.1
         paths:
           - src
 
@@ -14,3 +16,5 @@ ignore:
   docs/*
   cmake/*
   test/*
+
+comment: off
