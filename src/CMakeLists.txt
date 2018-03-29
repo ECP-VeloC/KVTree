@@ -23,6 +23,9 @@ LIST(APPEND libkvtree_install_headers
 	kvtree.h
     kvtree_util.h
 )
+IF(MPI)
+    LIST(APPEND libkvtree_install_headers kvtree_mpi.h)
+ENDIF(MPI)
 INSTALL(FILES ${libkvtree_install_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 LIST(APPEND libkvtree_srcs
