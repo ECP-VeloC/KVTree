@@ -93,6 +93,9 @@ int kvtree_open_with_lock(const char* file, int flags, mode_t mode);
 /* unlocks the specified file descriptor and then closes the file */
 int kvtree_close_with_unlock(const char* file, int fd);
 
+/* seek file descriptor to specified position */
+int kvtree_lseek(const char* file, int fd, off_t pos, int whence);
+
 /* make a good attempt to read from file (retries, if necessary, return error if fail) */
 ssize_t kvtree_read_attempt(const char* file, int fd, void* buf, size_t size);
 
