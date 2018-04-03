@@ -334,8 +334,8 @@ int kvtree_write_gather(
   }
 
   /* free our hash data */
-  kvtree_free(&recv);
-  kvtree_free(&send);
+  kvtree_delete(&recv);
+  kvtree_delete(&send);
 
   /* create file name for rank2file index */
   char mapfile[1024];
