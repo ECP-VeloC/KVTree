@@ -38,7 +38,7 @@ LIST(APPEND libkvtree_srcs
 )
 
 IF(MPI)
-	LIST(APPEND libkvtree_srcs kvtree_mpi.c kvtree_io_mpi.c)
+	LIST(APPEND libkvtree_srcs kvtree_mpi.c kvtree_mpi_io.c)
 ENDIF(MPI)
 
 # KVTREE Library
