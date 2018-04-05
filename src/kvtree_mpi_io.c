@@ -52,26 +52,6 @@ static int pick_writer(
   MPI_Comm_rank(comm, &rank);
   MPI_Comm_size(comm, &ranks);
 
-#if 0
-  /* this code groups procs into consecutive ranges like a k-nomial tree
-   * of degree width+1 */
-  int width = 3;
-  int range = 1;
-  while (level > 0) {
-    range *= width;
-    level--;
-  }
-  int level_writer_id = rank / range;
-  int writer = level_writer_id * range;
-  int count = range;
-  if (writer + count >= ranks) {
-    count = ranks - writer;
-  }
-  *outwriter = writer;
-  *outranks  = count;
-  return KVTREE_SUCCESS;
-#endif
-
   /* first find our offset */
   unsigned long offset;
   MPI_Scan(&count, &offset, 1, MPI_UNSIGNED_LONG, MPI_SUM, comm);
@@ -187,14 +167,13 @@ static unsigned long kvtree_write_gather_map(
   kvtree* send = kvtree_new();
   kvtree* recv = kvtree_new();
 
-  /* if we have valid values, prepare hash to send to writer */
+  /* if we have valid values, queue it to send to writer */
   if (valid) {
-    /* attach data to send hash */
-    kvtree_setf(send, hash, "%d", writer);
-  } else {
-    /* nothing to send, so delete data hash */
-    kvtree_delete(&hash);
+    kvtree_exchange_sendq(send, writer, hash);
   }
+
+  /* delete data hash */
+  kvtree_delete(&hash);
 
   /* gather hash to writers */
   kvtree_exchange_direction(send, recv, comm, KVTREE_EXCHANGE_LEFT);
@@ -313,12 +292,8 @@ int kvtree_write_gather(
   kvtree* send = kvtree_new();
   kvtree* recv = kvtree_new();
 
-  /* copy data into send hash (note we don't have to delete temp since
-   * we attach it to the send hash here */
-  kvtree* temp = kvtree_new();
-  kvtree_merge(temp, data);
-  kvtree_setf(send, temp, "%d", writer);
-//  kvtree_exchange_sendq(send, writer, data);
+  /* copy data into send hash */
+  kvtree_exchange_sendq(send, writer, data);
 
   /* gather hashes to writers */
   kvtree_exchange_direction(send, recv, comm, KVTREE_EXCHANGE_LEFT);
