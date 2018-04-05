@@ -41,6 +41,14 @@ int kvtree_sendrecv(
 /* broadcasts a hash from a root and unpacks it into specified hash on all other tasks */
 int kvtree_bcast(kvtree* hash, int root, MPI_Comm comm);
 
+/* insert message destined for rank into send kvtree,
+ * merges msg with any existing data destined for the same rank */
+int kvtree_exchange_sendq(
+  kvtree* send_hash, /* kvtree to attach message to */
+  int rank,          /* destination rank */
+  const kvtree* msg  /* data to be send to rank */
+);
+
 /* execute a (sparse) global exchange, similar to an alltoallv operation
  *
  * hash_send specifies destinations as:

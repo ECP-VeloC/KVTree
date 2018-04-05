@@ -233,6 +233,24 @@ int kvtree_bcast(kvtree* hash, int root, MPI_Comm comm)
   return KVTREE_SUCCESS;
 }
 
+/* insert message destined for rank into send kvtree */
+int kvtree_exchange_sendq(kvtree* send_hash, int rank, const kvtree* msg)
+{
+  /* see whether we've already got data for this rank,
+   * if so, merge it in, otherwise create a copy and add it */
+  kvtree* hash = kvtree_getf(send_hash, "%d", rank);
+  if (hash == NULL) {
+    /* no hash going to this rank yet, make a copy of the message and attach it */
+    kvtree* copy = kvtree_new();
+    kvtree_merge(copy, msg);
+    kvtree_setf(send_hash, copy, "%d", rank);
+  } else {
+    /* got something already, just merge this message with outgoing data */
+    kvtree_merge(hash, msg);
+  }
+  return KVTREE_SUCCESS;
+}
+
 /* execute a (sparse) global exchange, similar to an alltoallv operation
  *
  * hash_send specifies destinations as:
