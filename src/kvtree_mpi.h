@@ -78,4 +78,20 @@ int kvtree_exchange_direction(
   kvtree_exchange_enum direction
 );
 
+/* gather data from each process in comm, and write to a series of files
+ * specified by the path and filename prefix */
+int kvtree_write_gather(
+  const char* prefix, /* IN - path/filename prefix to prepend to filenames */
+  kvtree* data,       /* IN - input data */
+  MPI_Comm comm       /* IN - communicator of participating processes */
+);
+
+/* read from a series of files specified by the path and filename prefix,
+ * and scatter data to each process in comm */
+int kvtree_read_scatter(
+  const char* prefix, /* IN  - path/filename prefix to prepend to filenames */
+  kvtree* data,       /* OUT - output data */
+  MPI_Comm comm       /* IN  - communicator of participating processes */
+);
+
 #endif

@@ -244,6 +244,19 @@ int kvtree_close_with_unlock(const char* file, int fd)
   return kvtree_close(file, fd);
 }
 
+/* seek file descriptor to specified position */
+int kvtree_lseek(const char* file, int fd, off_t pos, int whence)
+{
+  off_t rc = lseek(fd, pos, whence);
+  if (rc == (off_t)-1) {
+    kvtree_err("Error seeking %s: errno=%d %s @ %s:%d",
+      file, errno, strerror(errno), __FILE__, __LINE__
+    );
+    return KVTREE_FAILURE;
+  }
+  return KVTREE_SUCCESS;
+}
+
 /* make a good attempt to read from file (retries, if necessary, return error if fail) */
 ssize_t kvtree_read_attempt(const char* file, int fd, void* buf, size_t size)
 {
