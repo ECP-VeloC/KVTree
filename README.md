@@ -48,3 +48,15 @@ To reference SCR in a publication, please cite the following paper:
 Additional information and research publications can be found here:
 
 [http://computation.llnl.gov/projects/scalable-checkpoint-restart-for-mpi](http://computation.llnl.gov/projects/scalable-checkpoint-restart-for-mpi)
+
+## Release
+
+Copyright (c) 2018, Lawrence Livermore National Security, LLC.
+Produced at the Lawrence Livermore National Laboratory.
+<br>
+Copyright (c) 2018, UChicago Argonne LLC, operator of Argonne National Laboratory.
+
+
+For release details and restrictions, please read the [LICENSE](https://github.com/LLNL/AXL/blob/master/LICENSE) and [NOTICE](https://github.com/LLNL/AXL/blob/master/NOTICE) files.
+
+`LLNL-CODE-751725` `OCEC-18-060`
