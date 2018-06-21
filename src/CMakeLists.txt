@@ -1,16 +1,3 @@
-# Copyright (c) 2018, Lawrence Livermore National Security, LLC.
-# Produced at the Lawrence Livermore National Laboratory.
-#
-# Copyright (c) 2018, UChicago Argonne LLC,
-#   operator of Argonne National Laboratory
-#
-# LLNL-CODE-745961
-# All rights reserved.
-#
-# This is the license for KVTree.
-# For details, see https://github.com/LLNL/KVTree
-# Please read the LICENSE file for full license text.
-
 # Header files need not be enumerated
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
