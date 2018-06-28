@@ -4,6 +4,11 @@
 #include "mpi.h"
 #include "kvtree.h"
 
+/* enable C++ codes to include this header directly */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 =========================================
 Hash MPI transfer functions
@@ -78,5 +83,10 @@ int kvtree_read_scatter(
   kvtree* data,       /* OUT - output data */
   MPI_Comm comm       /* IN  - communicator of participating processes */
 );
+
+/* enable C++ codes to include this header directly */
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif
