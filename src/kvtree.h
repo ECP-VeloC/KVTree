@@ -36,6 +36,11 @@
 #include <stdarg.h>
 #include <sys/types.h>
 
+/* enable C++ codes to include this header directly */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
 =========================================
 This file defines the data structure for a hash,
@@ -262,5 +267,10 @@ int kvtree_print(const kvtree* hash, int indent);
 
 /* logs specified hash for debugging */
 int kvtree_log(const kvtree* hash, int log_level, int indent);
+
+/* enable C++ codes to include this header directly */
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif
