@@ -9,6 +9,7 @@
 #include "kvtree_helpers.h"
 #include "kvtree.h"
 #include "kvtree_mpi.h"
+#include "kvtree_util.h"
 
 #include <stdio.h>
 #include <stdlib.h>

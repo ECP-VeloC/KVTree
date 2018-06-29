@@ -1,5 +1,6 @@
 #include "test_kvtree.h"
 #include "test_kvtree_allocate_delete.h"
+#include "test_kvtree_kv.h"
 #include "test_kvtree_util.h"
 
 #include "stdlib.h"
