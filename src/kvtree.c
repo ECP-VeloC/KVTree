@@ -1570,7 +1570,11 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
 
     /* truncate file to new size */
     if (nwrite >= 0) {
-      ftruncate(*fd, (off_t) nwrite);
+      if (ftruncate(*fd, (off_t) nwrite) == -1) {
+        kvtree_err("ftruncate() failed: errno=%d (%s) @ %s:%d",
+          errno, strerror(errno), __FILE__, __LINE__
+        );
+      }
     }
 
     /* close the file and release the lock */
