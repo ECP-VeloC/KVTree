@@ -8,6 +8,11 @@
 /* compute crc32 */
 #include <zlib.h>
 
+/* enable C++ codes to include this header directly */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* the set functions all unset the key before setting it to ensure
  * that only one value is ever defined for a given key */
 
@@ -49,5 +54,10 @@ int kvtree_util_get_int64(const kvtree* hash, const char* key, int64_t* value);
 int kvtree_util_get_double(const kvtree* hash, const char* key, double* value);
 
 int kvtree_util_get_ptr(const kvtree* hash, const char* key, void** value);
+
+/* enable C++ codes to include this header directly */
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif
