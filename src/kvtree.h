@@ -256,6 +256,15 @@ int kvtree_lock_open_read(const char* file, int* fd, kvtree* hash);
 /* given a filename, an opened file descriptor, and a hash, overwrite file with hash, close, and unlock file */
 int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash);
 
+/* write kvtree as gather/scatter file, input kvtree must be in form:
+ *   0
+ *     <kvtree_for_rank_0>
+ *   1
+ *     <kvtree_for_rank_1>
+ * requires exactly one entry for each rank starting at 0 couting up to ranks-1
+ * items in kvtree do not need to be sorted before the call */
+int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks);
+
 /*
 =========================================
 Print hash and elements to stdout for debugging

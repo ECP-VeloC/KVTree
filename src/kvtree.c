@@ -1587,6 +1587,95 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
   return KVTREE_SUCCESS;
 }
 
+/* write kvtree as gather/scatter file, input kvtree must be in form:
+ *   0
+ *     <kvtree_for_rank_0>
+ *   1
+ *     <kvtree_for_rank_1> */
+int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
+{
+  int rc = KVTREE_SUCCESS;
+
+  /* we hardcode this to be two levels deep */
+
+  /* sort so that elements are ordered by rank value */
+  kvtree_sort_int(data, KVTREE_SORT_ASCENDING);
+
+  /* create hash for primary rank2file map and encode level */
+  kvtree* files_hash = kvtree_new();
+  kvtree_set_kv_int(files_hash, "LEVEL", 1);
+
+  /* iterate over each rank to record its info */
+  int writer = 0;
+  int max_rank = -1;
+  kvtree_elem* elem = kvtree_elem_first(data);
+  while (elem != NULL) {
+    /* create a hash to record an entry from each rank */
+    kvtree* entries = kvtree_new();
+    kvtree_set_kv_int(entries, "LEVEL", 0);
+
+    /* record up to 8K entries */
+    int count = 0;
+    while (count < 8192) {
+      /* get rank id */
+      int rank = kvtree_elem_key_int(elem);
+      if (rank > max_rank) {
+        max_rank = rank;
+      }
+
+      /* copy hash of current rank under RANK/<rank> in entries */
+      kvtree* elem_hash = kvtree_elem_hash(elem);
+      kvtree* rank_hash = kvtree_set_kv_int(entries, "RANK", rank);
+      kvtree_merge(rank_hash, elem_hash);
+      count++;
+
+      /* break early if we reach the end */
+      elem = kvtree_elem_next(elem);
+      if (elem == NULL) {
+        break;
+      }
+    }
+
+    /* record the number of ranks */
+    kvtree_set_kv_int(entries, "RANKS", count);
+
+    /* build name for part file */
+    char filename[1024];
+    snprintf(filename, sizeof(filename), "%s.0.%d", prefix, writer);
+
+    /* write hash to file rank2file part */
+    if (kvtree_write_file(filename, entries) != KVTREE_SUCCESS) {
+      rc = KVTREE_FAILURE;
+      elem = NULL;
+    }
+
+    /* delete part hash and path */
+    kvtree_delete(&entries);
+
+    /* record file name of part in files hash, relative to prefix directory */
+    char partname[1024];
+    snprintf(partname, sizeof(partname), ".0.%d", writer);
+    unsigned long offset = 0;
+    kvtree* files_rank_hash = kvtree_set_kv_int(files_hash, "RANK", writer);
+    kvtree_util_set_str(files_rank_hash, "FILE", partname);
+    kvtree_util_set_bytecount(files_rank_hash, "OFFSET", offset);
+
+    /* get id of next writer */
+    writer += count;
+  }
+
+  /* record total number of ranks in job as max rank + 1 */
+  kvtree_set_kv_int(files_hash, "RANKS", ranks);
+
+  /* write out rank2file map */
+  if (kvtree_write_file(prefix, files_hash) != KVTREE_SUCCESS) {
+    rc = KVTREE_FAILURE;
+  }
+  kvtree_delete(&files_hash);
+
+  return rc;
+}
+
 /*
 =========================================
 Print hash and elements to stdout for debugging
