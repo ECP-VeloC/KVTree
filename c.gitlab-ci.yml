@@ -1,8 +1,0 @@
-job:
-  tags:
-    - quartz
-    - shell
-  script:
-    - cmake -DCMAKE_C_FLAGS="coverage" -DMPI=ON
-    - make VERBOSE=1
-    - make check
