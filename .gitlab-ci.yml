@@ -3,6 +3,6 @@ job:
     - quartz
     - shell
   script:
-    - cmake -DCMAKE_C_FLAGS="coverage" -DCMAKE_C_COMPILER=/usr/tcetmp/bin/cc -DMPI=ON
+    - cmake -DMPI=ON
     - make VERBOSE=1
     - make check
