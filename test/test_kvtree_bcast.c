@@ -1,5 +1,4 @@
 #include "test_kvtree.h"
-#include "test_kvtree_bcast.h"
 #include "test_kvtree_util.h"
 #include "mpi.h"
 #include "stdio.h"

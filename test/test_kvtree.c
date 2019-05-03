@@ -24,6 +24,7 @@ int main(int argc, char** argv){
   test_kvtree_allocate_delete_init();
   test_kvtree_kv_init();
   test_kvtree_util_init();
+  //test_kvtree_bcast_init();
 
   /* Initialize state to count failures */
   int num_failed = 0;
