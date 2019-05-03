@@ -31,7 +31,7 @@ int main(int argc, char** argv){
   if (kvtree_rc != KVTREE_SUCCESS) rc = TEST_FAIL;
   if((val_of_one != 1) || (val_of_two != 2)) rc = TEST_FAIL;
   kvtree_rc = kvtree_util_get_int(kvtree, three, &val_of_three);
-  if (kvtree_rc = KVTREE_SUCCESS) rc = TEST_FAIL;
+  if (kvtree_rc == KVTREE_SUCCESS) rc = TEST_FAIL;
 printf("Rank = %d; ONE = %d; TWO = %d; rc = %d\n", rank, val_of_one, val_of_two, rc);
   kvtree_delete(&kvtree);
   if (kvtree != NULL) rc = TEST_FAIL;
