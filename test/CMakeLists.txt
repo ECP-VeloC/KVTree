@@ -36,6 +36,10 @@ ADD_EXECUTABLE(kvtree_exchange_test test_kvtree_exchange.c)
 TARGET_LINK_LIBRARIES(kvtree_exchange_test ${KVTREE_EXTERNAL_LIBS} kvtree)
 #ADD_TEST(NAME kvtree_exchange_test COMMAND ${MPIEXEC} -n 3 ./kvtree_exchange_test)
 ADD_TEST(NAME kvtree_exchange_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_exchange_test)
+ADD_EXECUTABLE(kvtree_write_gather_test test_kvtree_write_gather.c)
+TARGET_LINK_LIBRARIES(kvtree_write_gather_test ${KVTREE_EXTERNAL_LIBS} kvtree)
+#ADD_TEST(NAME kvtree_write_gather_test COMMAND ${MPIEXEC} -n 3 ./kvtree_write_gather_test
+ADD_TEST(NAME kvtree_write_gather_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_write_gather_test)
 
 
 ####################
