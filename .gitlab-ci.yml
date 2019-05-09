@@ -3,6 +3,7 @@ job:
     - quartz
     - shell
   script:
+    - module load cmake/3.9.2
     - cmake -DMPI=ON
     - make VERBOSE=1
     - make check
