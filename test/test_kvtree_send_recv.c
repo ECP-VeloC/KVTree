@@ -29,7 +29,7 @@ int main(int argc, char** argv){
       printf("in rank 0 send to 2 failed");
       rc = TEST_FAIL;
     }
-    
+
     //receive from 1
     kvtree_rc = kvtree_recv(recv, 1, MPI_COMM_WORLD);
     if (kvtree_rc != KVTREE_SUCCESS){
@@ -80,7 +80,7 @@ int main(int argc, char** argv){
       printf("in rank 1 received values are not correct");
       rc = TEST_FAIL;
     }
-    
+
     //send to 0
     kvtree_util_set_int(kvtree, "ONE", 11);
     kvtree_util_set_int(kvtree, "TWO", 22);
@@ -115,7 +115,7 @@ int main(int argc, char** argv){
       printf("in rank 2 received values are not correct");
       rc = TEST_FAIL;
     }
-    
+
     //send to 1
     kvtree_util_set_int(kvtree, "ONE", 111);
     kvtree_util_set_int(kvtree, "TWO", 222);
@@ -136,8 +136,7 @@ printf("Rank = %d; ONE = %d; TWO = %d; rc = %d\n", rank, val_of_one, val_of_two,
     rc = TEST_FAIL;
     printf("deletion of recv failed");
   }
-  
+
   MPI_Finalize();
   return rc;
 }
-
