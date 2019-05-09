@@ -8,7 +8,7 @@ int main(int argc, char** argv){
   int rc = TEST_PASS;
   int rank, ranks, kvtree_rc;
   int val_of_one, val_of_two, val_of_three;
-  const char one[3] = "ONE", two[3] = "TWO", three[5] = "THREE";
+  const char one[] = "ONE", two[] = "TWO", three[] = "THREE";
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
