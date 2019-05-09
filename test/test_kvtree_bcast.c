@@ -1,7 +1,8 @@
 #include "test_kvtree.h"
 #include "test_kvtree_util.h"
+#include "kvtree_mpi.h"
 #include "mpi.h"
-#include "stdio.h"
+#include <stdio.h>
 
 
 int main(int argc, char** argv){
