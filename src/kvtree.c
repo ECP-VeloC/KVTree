@@ -8,6 +8,7 @@
 #include "kvtree.h"
 #include "kvtree_io.h"
 #include "kvtree_helpers.h"
+#include "kvtree_util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1770,7 +1771,7 @@ int kvtree_log(const kvtree* hash, int log_level, int indent)
   return KVTREE_SUCCESS;
 }
 
-#ifndef HIDE_TV
+#ifdef HAVE_TV
 /*
 =========================================
 Pretty print for TotalView debug window
