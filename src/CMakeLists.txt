@@ -10,9 +10,9 @@ LIST(APPEND libkvtree_install_headers
 	kvtree.h
     kvtree_util.h
 )
-IF(MPI)
+IF(MPI_FOUND)
     LIST(APPEND libkvtree_install_headers kvtree_mpi.h)
-ENDIF(MPI)
+ENDIF(MPI_FOUND)
 INSTALL(FILES ${libkvtree_install_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 LIST(APPEND libkvtree_srcs
@@ -24,9 +24,9 @@ LIST(APPEND libkvtree_srcs
     tv_data_display.c
 )
 
-IF(MPI)
+IF(MPI_FOUND)
 	LIST(APPEND libkvtree_srcs kvtree_mpi.c kvtree_mpi_io.c)
-ENDIF(MPI)
+ENDIF(MPI_FOUND)
 
 # KVTREE Library
 ADD_LIBRARY(kvtree_o OBJECT ${libkvtree_srcs})
