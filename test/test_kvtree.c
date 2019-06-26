@@ -3,9 +3,9 @@
 #include "test_kvtree_kv.h"
 #include "test_kvtree_util.h"
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 void register_test(test_ptr_t test, char* test_name){
   char* name = strdup(test_name);
