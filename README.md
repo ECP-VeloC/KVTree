@@ -7,6 +7,8 @@ structure modeled after Perl hashes.
 
 KVTree was originally part of the SCR Library.
 
+Details on the library can be found in the [User API docs](https://ecp-veloc.github.io/component-user-docs/group__kvtree.html).
+
 ## Quickstart
 
 KVTree uses the CMake build system and we recommend out-of-source builds.
