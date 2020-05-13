@@ -7,6 +7,10 @@
 #include <stdio.h>
 #include <string.h>
 
+int num_tests;
+test_ptr_t* test_ptrs;
+char** test_names;
+
 void register_test(test_ptr_t test, char* test_name){
   char* name = strdup(test_name);
   test_ptrs[num_tests] = test;
