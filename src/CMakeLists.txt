@@ -53,7 +53,7 @@ INSTALL(TARGETS kvtree-static DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 # Individual binaries generated from a single .c file
 LIST(APPEND clikvtree_c_bins
-    kvtree_print_file
+    kvtree_print
 )
 
 # Build and install C binaries
