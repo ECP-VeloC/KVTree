@@ -1678,34 +1678,72 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
 ///@{
 
 /** prints specified hash element to stdout for debugging */
-static int kvtree_elem_print(const kvtree_elem* elem, int indent)
+static int kvtree_elem_print(const kvtree_elem* elem, int indent, int mode)
 {
   char tmp[KVTREE_MAX_FILENAME];
   int i;
-  for (i=0; i<indent; i++) {
+  for (i = 0; i < indent; i++) {
     tmp[i] = ' ';
   }
   tmp[indent] = '\0';
 
-  if (elem != NULL) {
-    if (elem->key != NULL) {
-      printf("%s%s\n", tmp, elem->key);
+  if (mode == KVTREE_PRINT_TREE) {
+    if (elem != NULL) {
+      if (elem->key != NULL) {
+        printf("%s%s\n", tmp, elem->key);
+      } else {
+        printf("%sNULL KEY\n", tmp);
+      }
+      kvtree_print_mode(elem->hash, indent, mode);
     } else {
-      printf("%sNULL KEY\n", tmp);
+      printf("%sNULL ELEMENT\n", tmp);
     }
-    kvtree_print(elem->hash, indent);
-  } else {
-    printf("%sNULL ELEMENT\n", tmp);
+
+    return KVTREE_SUCCESS;
   }
+
+  if (mode == KVTREE_PRINT_KEYVAL) {
+    if (elem != NULL) {
+      if (elem->key != NULL) {
+        if (kvtree_size(elem->hash) == 1) {
+          /* hash for current element has one value, this may be a key/value pair */
+          kvtree_elem* elem2 = kvtree_elem_first(elem->hash);
+          if (elem2->hash == NULL || kvtree_size(elem2->hash) == 0) {
+            /* my hash has one value, and the hash for that one value
+             * is empty, so print this as a key/value pair */
+            printf("%s%s = %s\n", tmp, elem->key, elem2->key);
+          } else {
+            /* my hash has one value, but the hash for that one value is
+             * non-empty so we need to recurse into hash */
+            printf("%s%s\n", tmp, elem->key);
+            kvtree_print_mode(elem->hash, indent, mode);
+          }
+        } else {
+          /* hash for current element has 0 or more than one items,
+           * so we need to recurse into hash */
+          printf("%s%s\n", tmp, elem->key);
+          kvtree_print_mode(elem->hash, indent, mode);
+        }
+      } else {
+        printf("%sNULL KEY\n", tmp);
+        kvtree_print_mode(elem->hash, indent, mode);
+      }
+    } else {
+      printf("%sNULL ELEMENT\n", tmp);
+    }
+
+    return KVTREE_SUCCESS;
+  }
+
   return KVTREE_SUCCESS;
 }
 
 /** prints specified hash to stdout for debugging */
-int kvtree_print(const kvtree* hash, int indent)
+int kvtree_print_mode(const kvtree* hash, int indent, int mode)
 {
   char tmp[KVTREE_MAX_FILENAME];
   int i;
-  for (i=0; i<indent; i++) {
+  for (i = 0; i < indent; i++) {
     tmp[i] = ' ';
   }
   tmp[indent] = '\0';
@@ -1713,12 +1751,18 @@ int kvtree_print(const kvtree* hash, int indent)
   if (hash != NULL) {
     kvtree_elem* elem;
     LIST_FOREACH(elem, hash, pointers) {
-      kvtree_elem_print(elem, indent+2);
+      kvtree_elem_print(elem, indent + 2, mode);
     }
   } else {
     printf("%sNULL LIST\n", tmp);
   }
   return KVTREE_SUCCESS;
+}
+
+/** prints specified hash to stdout for debugging */
+int kvtree_print(const kvtree* hash, int indent)
+{
+  return kvtree_print_mode(hash, indent, KVTREE_PRINT_TREE);
 }
 
 /** logs specified hash element to stdout for debugging */
