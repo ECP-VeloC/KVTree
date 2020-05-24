@@ -69,6 +69,9 @@ extern "C" {
 #define KVTREE_SUCCESS (0)
 #define KVTREE_MAX_FILENAME (1024)
 
+#define KVTREE_PRINT_TREE   (1)
+#define KVTREE_PRINT_KEYVAL (2)
+
 /********************************************************/
 /** \name Sort directions for sorting keys in hash */
 ///@{
@@ -278,6 +281,9 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks);
 
 /** prints specified hash to stdout for debugging */
 int kvtree_print(const kvtree* hash, int indent);
+
+/** prints specified hash to stdout for debugging */
+int kvtree_print_mode(const kvtree* hash, int indent, int mode);
 
 /** logs specified hash for debugging */
 int kvtree_log(const kvtree* hash, int log_level, int indent);
