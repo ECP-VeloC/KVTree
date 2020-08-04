@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 
 # Install header files
 LIST(APPEND libkvtree_install_headers
-	kvtree.h
+    kvtree.h
     kvtree_util.h
 )
 IF(MPI_FOUND)
@@ -15,8 +15,17 @@ IF(MPI_FOUND)
 ENDIF(MPI_FOUND)
 INSTALL(FILES ${libkvtree_install_headers} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+LIST(APPEND libkvtree_noMPI_srcs
+    kvtree.c
+    kvtree_util.c
+    kvtree_io.c
+    kvtree_helpers.c
+    kvtree_err.c
+    tv_data_display.c
+)
+
 LIST(APPEND libkvtree_srcs
-	kvtree.c
+    kvtree.c
     kvtree_util.c
     kvtree_io.c
     kvtree_helpers.c
@@ -25,7 +34,7 @@ LIST(APPEND libkvtree_srcs
 )
 
 IF(MPI_FOUND)
-	LIST(APPEND libkvtree_srcs kvtree_mpi.c kvtree_mpi_io.c)
+    LIST(APPEND libkvtree_srcs kvtree_mpi.c kvtree_mpi_io.c)
 ENDIF(MPI_FOUND)
 
 # KVTREE Library
@@ -38,14 +47,31 @@ INSTALL(TARGETS kvtree DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ADD_LIBRARY(kvtree-static STATIC $<TARGET_OBJECTS:kvtree_o>)
 IF(KVTREE_LINK_STATIC)
-        SET_TARGET_PROPERTIES(kvtree-static PROPERTIES LINK_SEARCH_START_STATIC 1)
-        SET_TARGET_PROPERTIES(kvtree-static PROPERTIES LINK_SEARCH_END_STATIC 1)
+    SET_TARGET_PROPERTIES(kvtree-static PROPERTIES LINK_SEARCH_START_STATIC 1)
+    SET_TARGET_PROPERTIES(kvtree-static PROPERTIES LINK_SEARCH_END_STATIC 1)
 ENDIF(KVTREE_LINK_STATIC)
 TARGET_LINK_LIBRARIES(kvtree-static ${KVTREE_EXTERNAL_LIBS})
 
 SET_TARGET_PROPERTIES(kvtree-static PROPERTIES OUTPUT_NAME kvtree CLEAN_DIRECT_OUTPUT 1)
 INSTALL(TARGETS kvtree-static DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
+# KVTREE base Library (no MPI)
+ADD_LIBRARY(kvtree_noMPI_o OBJECT ${libkvtree_noMPI_srcs})
+
+ADD_LIBRARY(kvtree_base SHARED $<TARGET_OBJECTS:kvtree_noMPI_o>)
+TARGET_LINK_LIBRARIES(kvtree_base ${KVTREE_SERIAL_LIBS})
+SET_TARGET_PROPERTIES(kvtree_base PROPERTIES OUTPUT_NAME kvtree_base CLEAN_DIRECT_OUTPUT 1)
+INSTALL(TARGETS kvtree_base DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+ADD_LIBRARY(kvtree_base-static STATIC $<TARGET_OBJECTS:kvtree_noMPI_o>)
+IF(KVTREE_LINK_STATIC)
+    SET_TARGET_PROPERTIES(kvtree_base-static PROPERTIES LINK_SEARCH_START_STATIC 1)
+    SET_TARGET_PROPERTIES(kvtree_base-static PROPERTIES LINK_SEARCH_END_STATIC 1)
+ENDIF(KVTREE_LINK_STATIC)
+TARGET_LINK_LIBRARIES(kvtree_base-static ${KVTREE_SERIAL_LIBS})
+
+SET_TARGET_PROPERTIES(kvtree_base-static PROPERTIES OUTPUT_NAME kvtree_base CLEAN_DIRECT_OUTPUT 1)
+INSTALL(TARGETS kvtree_base-static DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 ###########
 # CLI KVTREE #
@@ -58,7 +84,7 @@ LIST(APPEND clikvtree_c_bins
 
 # Build and install C binaries
 FOREACH(bin IN ITEMS ${clikvtree_c_bins})
-	ADD_EXECUTABLE(${bin} ${bin}.c)
-	TARGET_LINK_LIBRARIES(${bin} kvtree)
-	INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${bin} DESTINATION ${CMAKE_INSTALL_BINDIR})
+    ADD_EXECUTABLE(${bin} ${bin}.c)
+    TARGET_LINK_LIBRARIES(${bin} kvtree)
+    INSTALL(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${bin} DESTINATION ${CMAKE_INSTALL_BINDIR})
 ENDFOREACH(bin IN ITEMS ${clikvtree_c_bins})
