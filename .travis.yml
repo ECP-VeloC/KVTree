@@ -81,7 +81,7 @@ before_install:
 script:
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_FLAGS="-coverage" -DMPI=ON
+  - cmake .. -DCMAKE_C_COMPILER=$CC -DCMAKE_CXX_COMPILER=$CXX -DCMAKE_C_FLAGS="-coverage" -DMPI=ON -DVELOC_RESOURCE_MANAGER=NONE
   - make VERBOSE=1
   - make check
 
