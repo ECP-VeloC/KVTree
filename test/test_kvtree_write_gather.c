@@ -1,7 +1,7 @@
 #include "test_kvtree.h"
 #include "test_kvtree_util.h"
-#include "mpi.h"
-#include "stdio.h"
+#include <mpi.h>
+#include <stdio.h>
 
 //This is the test of kvtree_write_gather/kvtree_read_scatter functionality. The former writes a hash from multiple processes to files with specified prefex,
 //and the latter reads them from files.

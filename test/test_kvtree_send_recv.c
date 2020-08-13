@@ -1,8 +1,8 @@
 #include "test_kvtree.h"
 #include "test_kvtree_util.h"
 #include "kvtree_mpi.h"
-#include "mpi.h"
-#include "stdio.h"
+#include <mpi.h>
+#include <stdio.h>
 
 //This is the test of kvtree_send/kvtree_recv functionality.
 //In order to avoid deadlock, kvtree_send preceeds kvtree_recv in process 0 only.

@@ -23,6 +23,9 @@ ADD_TEST(roundtrip_tests test_kvtree)
 # print test script
 FIND_PROGRAM(PRINT_TEST ${CMAKE_CURRENT_SOURCE_DIR}/print_test)
 ADD_TEST(NAME print_test COMMAND ${PRINT_TEST} ${PROJECT_BINARY_DIR}/src/kvtree_print ${CMAKE_CURRENT_SOURCE_DIR}/files)
+
+IF(MPI_FOUND)
+
 ADD_EXECUTABLE(kvtree_bcast_test test_kvtree_bcast.c)
 TARGET_LINK_LIBRARIES(kvtree_bcast_test ${KVTREE_EXTERNAL_LIBS} kvtree)
 KVTREE_ADD_TEST(kvtree_bcast_test 256 "")
