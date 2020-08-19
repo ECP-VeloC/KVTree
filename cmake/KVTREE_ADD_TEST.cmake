@@ -8,7 +8,8 @@ function(KVTREE_ADD_TEST name args outputs)
   elseif(${VELOC_RESOURCE_MANAGER} STREQUAL "SLURM")
     set(test_param srun -N 3 -n 3)
   endif(${VELOC_RESOURCE_MANAGER} STREQUAL "NONE")
-
+#  endif()
+ 
   # Tests
   add_test(NAME ${name} COMMAND ${test_param} ./${name} ${args} )
 
