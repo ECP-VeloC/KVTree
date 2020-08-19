@@ -47,6 +47,7 @@ TARGET_LINK_LIBRARIES(kvtree_bad_arg_test ${KVTREE_EXTERNAL_LIBS} kvtree)
 KVTREE_ADD_TEST(kvtree_bad_arg_test 256 "")
 #ADD_TEST(NAME kvtree_bad_arg_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_bad_arg_test)
 
+ENDIF()
 ####################
 # make a verbose "test" target named "check"
 ####################
