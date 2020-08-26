@@ -1,9 +1,21 @@
-job:
+slurm-job:
   tags:
     - quartz
-    - shell
+    - batch
+  variables:
+    LLNL_SLURM_SCHEDULER_PARAMETERS: "-N 3 -p pbatch"
   script:
-    - module load cmake/3.9.2
-    - cmake -DMPI=ON
+    - cmake -DMPI=ON -DVELOC_RESOURCE_MANAGER=SLURM
+    - make VERBOSE=1
+    - make check
+
+lsf-job:
+  tags:
+    - lassen
+    - batch 
+  variables:
+    LLNL_LSF_SCHEDULER_PARAMETERS: "-nnodes 3 -q pbatch"
+  script:
+    - cmake -DMPI=ON -DVELOC_RESOURCE_MANAGER=LSF
     - make VERBOSE=1
     - make check

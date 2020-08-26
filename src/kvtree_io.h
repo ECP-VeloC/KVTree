@@ -54,11 +54,6 @@
 #define KVTREE_OPEN_USLEEP (100)
 
 
-/** \file kvtree_io.h
- *  \ingroup kvtree
- *  \brief Basic File I/O
- */
-
 /** returns user's current mode as determine by their umask */
 mode_t kvtree_getmode(int read, int write, int execute);
 
