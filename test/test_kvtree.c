@@ -3,9 +3,13 @@
 #include "test_kvtree_kv.h"
 #include "test_kvtree_util.h"
 
-#include "stdlib.h"
-#include "stdio.h"
-#include "string.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
+int num_tests;
+test_ptr_t* test_ptrs;
+char** test_names;
 
 void register_test(test_ptr_t test, char* test_name){
   char* name = strdup(test_name);
@@ -24,6 +28,7 @@ int main(int argc, char** argv){
   test_kvtree_allocate_delete_init();
   test_kvtree_kv_init();
   test_kvtree_util_init();
+  //test_kvtree_bcast_init();
 
   /* Initialize state to count failures */
   int num_failed = 0;

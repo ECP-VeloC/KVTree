@@ -1,4 +1,5 @@
-/* Defines a recursive hash data structure, where at the top level,
+/** \file kvtree.c
+ * Defines a recursive hash data structure, where at the top level,
  * there is a list of elements indexed by string.  Each
  * of these elements in turn consists of a list of elements
  * indexed by string, and so on. */
@@ -8,6 +9,7 @@
 #include "kvtree.h"
 #include "kvtree_io.h"
 #include "kvtree_helpers.h"
+#include "kvtree_util.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,13 +31,10 @@
 #define KVTREE_FILE_HASH_HEADER_SIZE (20)
 #define KVTREE_FILE_FLAGS_CRC32 (0x1) /* indicates that crc32 is stored at end of file */
 
-/*
-=========================================
-Allocate and delete hash objects
-=========================================
-*/
-
-/* allocates a new hash element */
+/* ================================================= */
+/** @name Allocate and delete hash objects */
+///@{
+/** allocates a new hash element */
 static kvtree_elem* kvtree_elem_new()
 {
   kvtree_elem* elem = (kvtree_elem*) KVTREE_MALLOC(sizeof(kvtree_elem));
@@ -44,7 +43,7 @@ static kvtree_elem* kvtree_elem_new()
   return elem;
 }
 
-/* frees a hash element */
+/** frees a hash element */
 static int kvtree_elem_delete(kvtree_elem* elem)
 {
   if (elem != NULL) {
@@ -61,7 +60,7 @@ static int kvtree_elem_delete(kvtree_elem* elem)
   return KVTREE_SUCCESS;
 }
 
-/* allocates a new hash */
+/** allocates a new hash */
 kvtree* kvtree_new()
 {
   kvtree* hash = (kvtree*) KVTREE_MALLOC(sizeof(kvtree));
@@ -69,7 +68,7 @@ kvtree* kvtree_new()
   return hash;
 }
 
-/* frees a hash */
+/** frees a hash */
 int kvtree_delete(kvtree** ptr_hash)
 {
   if (ptr_hash != NULL) {
@@ -85,14 +84,12 @@ int kvtree_delete(kvtree** ptr_hash)
   }
   return KVTREE_SUCCESS;
 }
+///@}
 
-/*
-=========================================
-size, get, set, unset, and merge functions
-=========================================
-*/
-
-/* given an element, set its key and hash fields */
+/* ================================================= */
+/** @name size, get, set, unset, and merge functions */
+///@{
+/** given an element, set its key and hash fields */
 static kvtree_elem* kvtree_elem_init(kvtree_elem* elem, const char* key, kvtree* hash)
 {
   if (elem != NULL) {
@@ -110,7 +107,7 @@ static kvtree_elem* kvtree_elem_init(kvtree_elem* elem, const char* key, kvtree*
   return elem;
 }
 
-/* return size of hash (number of keys) */
+/** return size of hash (number of keys) */
 int kvtree_size(const kvtree* hash)
 {
   int count = 0;
@@ -123,7 +120,7 @@ int kvtree_size(const kvtree* hash)
   return count;
 }
 
-/* given a hash and a key, return the hash associated with key,
+/** given a hash and a key, return the hash associated with key,
  * returns NULL if not found */
 kvtree* kvtree_get(const kvtree* hash, const char* key)
 {
@@ -134,7 +131,7 @@ kvtree* kvtree_get(const kvtree* hash, const char* key)
   return NULL;
 }
 
-/* given a hash, a key, and a hash value, set (or reset) the key's
+/** given a hash, a key, and a hash value, set (or reset) the key's
  * hash and return the pointer to the new hash */
 kvtree* kvtree_set(kvtree* hash, const char* key, kvtree* hash_value)
 {
@@ -165,7 +162,7 @@ kvtree* kvtree_set(kvtree* hash, const char* key, kvtree* hash_value)
   return elem->hash;
 }
 
-/* given a hash and a key, extract and return hash for specified key,
+/** given a hash and a key, extract and return hash for specified key,
  * returns NULL if not found */
 kvtree* kvtree_extract(kvtree* hash, const char* key)
 {
@@ -183,7 +180,7 @@ kvtree* kvtree_extract(kvtree* hash, const char* key)
   return NULL;
 }
 
-/* given a hash and a key, extract and delete any matching element */
+/** given a hash and a key, extract and delete any matching element */
 int kvtree_unset(kvtree* hash, const char* key)
 {
   if (hash == NULL) {
@@ -197,7 +194,7 @@ int kvtree_unset(kvtree* hash, const char* key)
   return KVTREE_SUCCESS;
 }
 
-/* unset all values in the hash, but don't delete it */
+/** unset all values in the hash, but don't delete it */
 int kvtree_unset_all(kvtree* hash)
 {
   kvtree_elem* elem = kvtree_elem_first(hash);
@@ -215,7 +212,7 @@ int kvtree_unset_all(kvtree* hash)
   return KVTREE_SUCCESS;
 }
 
-/* merges (copies) elements from hash2 into hash1 */
+/** merges (copies) elements from hash2 into hash1 */
 int kvtree_merge(kvtree* hash1, const kvtree* hash2)
 {
   /* need hash1 to be valid to insert anything into it */
@@ -257,7 +254,7 @@ int kvtree_merge(kvtree* hash1, const kvtree* hash2)
   return rc;
 }
 
-/* traverse the given hash using a printf-like format string setting
+/** traverse the given hash using a printf-like format string setting
  * an arbitrary list of keys to set (or reset) the hash associated
  * with the last-most key */
 kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
@@ -375,7 +372,7 @@ kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
   return h;
 }
 
-/* return hash associated with list of keys */
+/** return hash associated with list of keys */
 kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
 {
   /* check that we have a hash */
@@ -474,19 +471,19 @@ kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
   return (kvtree*) h;
 }
 
-/* define a structure to hold the key and elem address */
+/** define a structure to hold the key and elem address */
 struct sort_elem_str {
   char* key;
   kvtree_elem* addr;
 };
 
-/* define a structure to hold the key and elem address */
+/** define a structure to hold the key and elem address */
 struct sort_elem_int {
   int key;
   kvtree_elem* addr;
 };
 
-/* sort strings in ascending order */
+/** sort strings in ascending order */
 static int kvtree_cmp_fn_str_asc(const void* a, const void* b)
 {
   struct sort_elem_str* elem_a = (struct sort_elem_str*) a;
@@ -497,7 +494,7 @@ static int kvtree_cmp_fn_str_asc(const void* a, const void* b)
   return cmp;
 }
 
-/* sort strings in descending order */
+/** sort strings in descending order */
 static int kvtree_cmp_fn_str_desc(const void* a, const void* b)
 {
   struct sort_elem_str* elem_a = (struct sort_elem_str*) a;
@@ -508,7 +505,7 @@ static int kvtree_cmp_fn_str_desc(const void* a, const void* b)
   return cmp;
 }
 
-/* sort integers in ascending order */
+/** sort integers in ascending order */
 static int kvtree_cmp_fn_int_asc(const void* a, const void* b)
 {
   struct sort_elem_int* elem_a = (struct sort_elem_int*) a;
@@ -518,7 +515,7 @@ static int kvtree_cmp_fn_int_asc(const void* a, const void* b)
   return (int) (int_a - int_b);
 }
 
-/* sort integers in descending order */
+/** sort integers in descending order */
 static int kvtree_cmp_fn_int_desc(const void* a, const void* b)
 {
   struct sort_elem_int* elem_a = (struct sort_elem_int*) a;
@@ -528,7 +525,7 @@ static int kvtree_cmp_fn_int_desc(const void* a, const void* b)
   return (int) (int_b - int_a);
 }
 
-/* sort the hash assuming the keys are ints */
+/** sort the hash assuming the keys are ints */
 int kvtree_sort(kvtree* hash, int direction)
 {
   /* get the size of the hash */
@@ -573,7 +570,7 @@ int kvtree_sort(kvtree* hash, int direction)
   return KVTREE_SUCCESS;
 }
 
-/* sort the hash assuming the keys are ints */
+/** sort the hash assuming the keys are ints */
 int kvtree_sort_int(kvtree* hash, int direction)
 {
   /* get the size of the hash */
@@ -618,7 +615,7 @@ int kvtree_sort_int(kvtree* hash, int direction)
   return KVTREE_SUCCESS;
 }
 
-/* given a hash, return a list of all keys converted to ints */
+/** given a hash, return a list of all keys converted to ints */
 /* caller must free list when done with it */
 int kvtree_list_int(const kvtree* hash, int* n, int** v)
 {
@@ -655,14 +652,13 @@ int kvtree_list_int(const kvtree* hash, int* n, int** v)
 
   return KVTREE_SUCCESS;
 }
+///@}
 
-/*
-=========================================
-get, set, and unset hashes using a key/value pair
-=========================================
-*/
+/* ================================================= */
+/** @name get, set, and unset hashes using a key/value pair */
+///@{
 
-/* shortcut to create a key and subkey in a hash with one call */
+/** shortcut to create a key and subkey in a hash with one call */
 kvtree* kvtree_set_kv(kvtree* hash, const char* key, const char* val)
 {
   if (hash == NULL) {
@@ -682,7 +678,7 @@ kvtree* kvtree_set_kv(kvtree* hash, const char* key, const char* val)
   return v;
 }
 
-/* same as kvtree_set_kv, but with the subkey specified as an int */
+/** same as kvtree_set_kv, but with the subkey specified as an int */
 kvtree* kvtree_set_kv_int(kvtree* hash, const char* key, int val)
 {
   /* TODO: this feels kludgy, but I guess as long as the ASCII string
@@ -693,7 +689,7 @@ kvtree* kvtree_set_kv_int(kvtree* hash, const char* key, int val)
   return kvtree_set_kv(hash, key, tmp);
 }
 
-/* shortcut to get hash assocated with the subkey of a key in a hash
+/** shortcut to get hash assocated with the subkey of a key in a hash
  * with one call */
 kvtree* kvtree_get_kv(const kvtree* hash, const char* key, const char* val)
 {
@@ -714,7 +710,7 @@ kvtree* kvtree_get_kv(const kvtree* hash, const char* key, const char* val)
   return v;
 }
 
-/* same as kvtree_get_kv, but with the subkey specified as an int */
+/** same as kvtree_get_kv, but with the subkey specified as an int */
 kvtree* kvtree_get_kv_int(const kvtree* hash, const char* key, int val)
 {
   /* TODO: this feels kludgy, but I guess as long as the ASCII string
@@ -725,7 +721,7 @@ kvtree* kvtree_get_kv_int(const kvtree* hash, const char* key, int val)
   return kvtree_get_kv(hash, key, tmp);
 }
 
-/* unset subkey under key, and if that removes the only element for
+/** unset subkey under key, and if that removes the only element for
  * key, unset key as well */
 int kvtree_unset_kv(kvtree* hash, const char* key, const char* val)
 {
@@ -742,7 +738,7 @@ int kvtree_unset_kv(kvtree* hash, const char* key, const char* val)
   return rc;
 }
 
-/* same as kvtree_unset_kv, but with the subkey specified as an int */
+/** same as kvtree_unset_kv, but with the subkey specified as an int */
 int kvtree_unset_kv_int(kvtree* hash, const char* key, int val)
 {
   /* TODO: this feels kludgy, but I guess as long as the ASCII string
@@ -759,7 +755,7 @@ Hash element functions
 =========================================
 */
 
-/* returns the first element for a given hash */
+/** returns the first element for a given hash */
 kvtree_elem* kvtree_elem_first(const kvtree* hash)
 {
   if (hash == NULL) {
@@ -769,7 +765,7 @@ kvtree_elem* kvtree_elem_first(const kvtree* hash)
   return elem;
 }
 
-/* given a hash element, returns the next element */
+/** given a hash element, returns the next element */
 kvtree_elem* kvtree_elem_next(const kvtree_elem* elem)
 {
   if (elem == NULL) {
@@ -779,7 +775,7 @@ kvtree_elem* kvtree_elem_next(const kvtree_elem* elem)
   return next;
 }
 
-/* returns a pointer to the key of the specified element */
+/** returns a pointer to the key of the specified element */
 char* kvtree_elem_key(const kvtree_elem* elem)
 {
   if (elem == NULL) {
@@ -789,7 +785,7 @@ char* kvtree_elem_key(const kvtree_elem* elem)
   return key;
 }
 
-/* same as kvtree_elem_key, but converts the key as an int (returns
+/** same as kvtree_elem_key, but converts the key as an int (returns
  * 0 if key is not defined) */
 int kvtree_elem_key_int(const kvtree_elem* elem)
 {
@@ -800,7 +796,7 @@ int kvtree_elem_key_int(const kvtree_elem* elem)
   return i;
 }
 
-/* returns a pointer to the hash of the specified element */
+/** returns a pointer to the hash of the specified element */
 kvtree* kvtree_elem_hash(const kvtree_elem* elem)
 {
   if (elem == NULL) {
@@ -810,7 +806,7 @@ kvtree* kvtree_elem_hash(const kvtree_elem* elem)
   return hash;
 }
 
-/* given a hash and a key, find first matching element and return its
+/** given a hash and a key, find first matching element and return its
  * address, returns NULL if not found */
 kvtree_elem* kvtree_elem_get(const kvtree* hash, const char* key)
 {
@@ -827,7 +823,7 @@ kvtree_elem* kvtree_elem_get(const kvtree* hash, const char* key)
   return NULL;
 }
 
-/* given a hash and a key, return a pointer to the key of the first
+/** given a hash and a key, return a pointer to the key of the first
  * element of that key's hash */
 char* kvtree_elem_get_first_val(const kvtree* hash, const char* key)
 {
@@ -844,7 +840,7 @@ char* kvtree_elem_get_first_val(const kvtree* hash, const char* key)
   return v;
 }
 
-/* given a hash and a key, find first matching element, remove it
+/** given a hash and a key, find first matching element, remove it
  * from the hash, and return it */
 kvtree_elem* kvtree_elem_extract(kvtree* hash, const char* key)
 {
@@ -855,7 +851,7 @@ kvtree_elem* kvtree_elem_extract(kvtree* hash, const char* key)
   return elem;
 }
 
-/* given a hash and a key (as integer), find first matching element,
+/** given a hash and a key (as integer), find first matching element,
  * remove it from the hash, and return it */
 kvtree_elem* kvtree_elem_extract_int(kvtree* hash, int key)
 {
@@ -869,7 +865,7 @@ kvtree_elem* kvtree_elem_extract_int(kvtree* hash, int key)
   return elem;
 }
 
-/* extract element from hash given the hash and the address of the
+/** extract element from hash given the hash and the address of the
  * element */
 kvtree_elem* kvtree_elem_extract_by_addr(kvtree* hash, kvtree_elem* elem)
 {
@@ -880,7 +876,7 @@ kvtree_elem* kvtree_elem_extract_by_addr(kvtree* hash, kvtree_elem* elem)
 
 /* TODO: replace calls to get_first_val with this which provides
  * additional check */
-/* returns key of first element belonging to the hash associated with
+/** returns key of first element belonging to the hash associated with
  * the given key in the given hash returns NULL if the key is not set
  * or if either hash is empty throws an error if the associated hash
  * has more than one element useful for keys that act as a single
@@ -909,14 +905,13 @@ char* kvtree_get_val(const kvtree* hash, const char* key)
 
   return value;
 }
+///@}
 
-/*
-=========================================
-Pack and unpack hash and elements into a char buffer
-=========================================
-*/
+/* ================================================= */
+/** @name Pack and unpack hash and elements into a char buffer */
+///@{
 
-/* computes the number of bytes needed to pack the given hash element */
+/** computes the number of bytes needed to pack the given hash element */
 static size_t kvtree_elem_pack_size(const kvtree_elem* elem)
 {
   size_t size = 0;
@@ -934,7 +929,7 @@ static size_t kvtree_elem_pack_size(const kvtree_elem* elem)
   return size;
 }
 
-/* packs a hash element into specified buf and returns the number of
+/** packs a hash element into specified buf and returns the number of
  * bytes written */
 static size_t kvtree_elem_pack(char* buf, const kvtree_elem* elem)
 {
@@ -956,7 +951,7 @@ static size_t kvtree_elem_pack(char* buf, const kvtree_elem* elem)
   return size;
 }
 
-/* unpacks hash element from specified buffer and returns the number of
+/** unpacks hash element from specified buffer and returns the number of
  * bytes read and a pointer to a newly allocated hash */
 static size_t kvtree_elem_unpack(const char* buf, kvtree_elem* elem)
 {
@@ -982,7 +977,7 @@ static size_t kvtree_elem_unpack(const char* buf, kvtree_elem* elem)
   return size;
 }
 
-/* computes the number of bytes needed to pack the given hash */
+/** computes the number of bytes needed to pack the given hash */
 size_t kvtree_pack_size(const kvtree* hash)
 {
   size_t size = 0;
@@ -1002,7 +997,7 @@ size_t kvtree_pack_size(const kvtree* hash)
   return size;
 }
 
-/* packs the given hash into specified buf and returns the number of
+/** packs the given hash into specified buf and returns the number of
  * bytes written */
 size_t kvtree_pack(char* buf, const kvtree* hash)
 {
@@ -1034,7 +1029,7 @@ size_t kvtree_pack(char* buf, const kvtree* hash)
   return size;
 }
 
-/* unpacks hash from specified buffer into given hash object and
+/** unpacks hash from specified buffer into given hash object and
  * returns the number of bytes read */
 size_t kvtree_unpack(const char* buf, kvtree* hash)
 {
@@ -1063,13 +1058,14 @@ size_t kvtree_unpack(const char* buf, kvtree* hash)
   /* return the size */
   return size;
 }
+///@}
 
-/*
-=========================================
-Read and write hash to a file
-=========================================
-*/
+/* ================================================= */
+/** @name Read and write hash to a file */
+///@{
 
+/** computes the size needed to persist a hash
+includes room for header, data, and crc32 */
 size_t kvtree_persist_size(const kvtree* hash)
 {
   /* compute the size of the file (includes header, data, and
@@ -1083,7 +1079,7 @@ size_t kvtree_persist_size(const kvtree* hash)
   return size;
 }
 
-/* persist hash in newly allocated buffer,
+/** persist hash in newly allocated buffer,
  * return buffer address and size to be freed by caller */
 int kvtree_write_persist(void** ptr_buf, size_t* ptr_size, const kvtree* hash)
 {
@@ -1139,7 +1135,7 @@ int kvtree_write_persist(void** ptr_buf, size_t* ptr_size, const kvtree* hash)
   return KVTREE_SUCCESS;;
 }
 
-/* executes logic of kvtree_has_write with opened file descriptor */
+/** executes logic of kvtree_has_write with opened file descriptor */
 ssize_t kvtree_write_fd(const char* file, int fd, const kvtree* hash)
 {
   /* check that we have a hash, a file name, and a file descriptor */
@@ -1166,7 +1162,7 @@ ssize_t kvtree_write_fd(const char* file, int fd, const kvtree* hash)
   return nwrite;
 }
 
-/* write the given hash to specified file */
+/** write the given hash to specified file */
 int kvtree_write_file(const char* file, const kvtree* hash)
 {
   int rc = KVTREE_SUCCESS;
@@ -1201,7 +1197,7 @@ int kvtree_write_file(const char* file, const kvtree* hash)
 }
 
 #if 0
-/* reads a hash from its persisted state stored at buf which is at
+/** reads a hash from its persisted state stored at buf which is at
  * least bufsize bytes long, merges hash into output parameter
  * and returns number of bytes processed or -1 on error */
 ssize_t kvtree_read_persist(const void* buf, size_t bufsize, kvtree* hash)
@@ -1290,7 +1286,7 @@ ssize_t kvtree_read_persist(const void* buf, size_t bufsize, kvtree* hash)
 }
 #endif
 
-/* executes logic of kvtree_read using an opened file descriptor */
+/** executes logic of kvtree_read using an opened file descriptor */
 ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
 {
   ssize_t nread;
@@ -1400,7 +1396,7 @@ ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
   return filesize;
 }
 
-/* opens specified file and reads in a hash storing its contents in
+/** opens specified file and reads in a hash storing its contents in
  * the given hash object */
 int kvtree_read_file(const char* file, kvtree* hash)
 {
@@ -1442,7 +1438,7 @@ int kvtree_read_file(const char* file, kvtree* hash)
   return rc;
 }
 
-/* given a filename and hash, lock/open/read/close/unlock the file */
+/** given a filename and hash, lock/open/read/close/unlock the file */
 int kvtree_read_with_lock(const char* file, kvtree* hash)
 {
   /* check that we got a filename */
@@ -1481,7 +1477,7 @@ int kvtree_read_with_lock(const char* file, kvtree* hash)
   return KVTREE_FAILURE;
 }
 
-/* given a filename and hash, lock the file, open it, and read it into
+/** given a filename and hash, lock the file, open it, and read it into
  * hash, set fd to the opened file descriptor */
 int kvtree_lock_open_read(const char* file, int* fd, kvtree* hash)
 {
@@ -1525,7 +1521,7 @@ int kvtree_lock_open_read(const char* file, int* fd, kvtree* hash)
   return KVTREE_FAILURE;
 }
 
-/* given a filename, an opened file descriptor, and a hash, overwrite
+/** given a filename, an opened file descriptor, and a hash, overwrite
  * file with hash, close, and unlock file */
 int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
 {
@@ -1587,41 +1583,167 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
   return KVTREE_SUCCESS;
 }
 
-/*
-=========================================
-Print hash and elements to stdout for debugging
-=========================================
-*/
+/** write kvtree as gather/scatter file, input kvtree must be in form:
+ *   0
+ *     <kvtree_for_rank_0>
+ *   1
+ *     <kvtree_for_rank_1> */
+int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
+{
+  int rc = KVTREE_SUCCESS;
 
-/* prints specified hash element to stdout for debugging */
-static int kvtree_elem_print(const kvtree_elem* elem, int indent)
+  /* we hardcode this to be two levels deep */
+
+  /* sort so that elements are ordered by rank value */
+  kvtree_sort_int(data, KVTREE_SORT_ASCENDING);
+
+  /* create hash for primary rank2file map and encode level */
+  kvtree* files_hash = kvtree_new();
+  kvtree_set_kv_int(files_hash, "LEVEL", 1);
+
+  /* iterate over each rank to record its info */
+  int writer = 0;
+  int max_rank = -1;
+  kvtree_elem* elem = kvtree_elem_first(data);
+  while (elem != NULL) {
+    /* create a hash to record an entry from each rank */
+    kvtree* entries = kvtree_new();
+    kvtree_set_kv_int(entries, "LEVEL", 0);
+
+    /* record up to 8K entries */
+    int count = 0;
+    while (count < 8192) {
+      /* get rank id */
+      int rank = kvtree_elem_key_int(elem);
+      if (rank > max_rank) {
+        max_rank = rank;
+      }
+
+      /* copy hash of current rank under RANK/<rank> in entries */
+      kvtree* elem_hash = kvtree_elem_hash(elem);
+      kvtree* rank_hash = kvtree_set_kv_int(entries, "RANK", rank);
+      kvtree_merge(rank_hash, elem_hash);
+      count++;
+
+      /* break early if we reach the end */
+      elem = kvtree_elem_next(elem);
+      if (elem == NULL) {
+        break;
+      }
+    }
+
+    /* record the number of ranks */
+    kvtree_set_kv_int(entries, "RANKS", count);
+
+    /* build name for part file */
+    char filename[1024];
+    snprintf(filename, sizeof(filename), "%s.0.%d", prefix, writer);
+
+    /* write hash to file rank2file part */
+    if (kvtree_write_file(filename, entries) != KVTREE_SUCCESS) {
+      rc = KVTREE_FAILURE;
+      elem = NULL;
+    }
+
+    /* delete part hash and path */
+    kvtree_delete(&entries);
+
+    /* record file name of part in files hash, relative to prefix directory */
+    char partname[1024];
+    snprintf(partname, sizeof(partname), ".0.%d", writer);
+    unsigned long offset = 0;
+    kvtree* files_rank_hash = kvtree_set_kv_int(files_hash, "RANK", writer);
+    kvtree_util_set_str(files_rank_hash, "FILE", partname);
+    kvtree_util_set_bytecount(files_rank_hash, "OFFSET", offset);
+
+    /* get id of next writer */
+    writer += count;
+  }
+
+  /* record total number of ranks in job as max rank + 1 */
+  kvtree_set_kv_int(files_hash, "RANKS", ranks);
+
+  /* write out rank2file map */
+  if (kvtree_write_file(prefix, files_hash) != KVTREE_SUCCESS) {
+    rc = KVTREE_FAILURE;
+  }
+  kvtree_delete(&files_hash);
+
+  return rc;
+}
+///@}
+
+/* ================================================= */
+/** @name Print hash and elements to stdout for debugging */
+///@{
+
+/** prints specified hash element to stdout for debugging */
+static int kvtree_elem_print(const kvtree_elem* elem, int indent, int mode)
 {
   char tmp[KVTREE_MAX_FILENAME];
   int i;
-  for (i=0; i<indent; i++) {
+  for (i = 0; i < indent; i++) {
     tmp[i] = ' ';
   }
   tmp[indent] = '\0';
 
-  if (elem != NULL) {
-    if (elem->key != NULL) {
-      printf("%s%s\n", tmp, elem->key);
+  if (mode == KVTREE_PRINT_TREE) {
+    if (elem != NULL) {
+      if (elem->key != NULL) {
+        printf("%s%s\n", tmp, elem->key);
+      } else {
+        printf("%sNULL KEY\n", tmp);
+      }
+      kvtree_print_mode(elem->hash, indent, mode);
     } else {
-      printf("%sNULL KEY\n", tmp);
+      printf("%sNULL ELEMENT\n", tmp);
     }
-    kvtree_print(elem->hash, indent);
-  } else {
-    printf("%sNULL ELEMENT\n", tmp);
+
+    return KVTREE_SUCCESS;
   }
+
+  if (mode == KVTREE_PRINT_KEYVAL) {
+    if (elem != NULL) {
+      if (elem->key != NULL) {
+        if (kvtree_size(elem->hash) == 1) {
+          /* hash for current element has one value, this may be a key/value pair */
+          kvtree_elem* elem2 = kvtree_elem_first(elem->hash);
+          if (elem2->hash == NULL || kvtree_size(elem2->hash) == 0) {
+            /* my hash has one value, and the hash for that one value
+             * is empty, so print this as a key/value pair */
+            printf("%s%s = %s\n", tmp, elem->key, elem2->key);
+          } else {
+            /* my hash has one value, but the hash for that one value is
+             * non-empty so we need to recurse into hash */
+            printf("%s%s\n", tmp, elem->key);
+            kvtree_print_mode(elem->hash, indent, mode);
+          }
+        } else {
+          /* hash for current element has 0 or more than one items,
+           * so we need to recurse into hash */
+          printf("%s%s\n", tmp, elem->key);
+          kvtree_print_mode(elem->hash, indent, mode);
+        }
+      } else {
+        printf("%sNULL KEY\n", tmp);
+        kvtree_print_mode(elem->hash, indent, mode);
+      }
+    } else {
+      printf("%sNULL ELEMENT\n", tmp);
+    }
+
+    return KVTREE_SUCCESS;
+  }
+
   return KVTREE_SUCCESS;
 }
 
-/* prints specified hash to stdout for debugging */
-int kvtree_print(const kvtree* hash, int indent)
+/** prints specified hash to stdout for debugging */
+int kvtree_print_mode(const kvtree* hash, int indent, int mode)
 {
   char tmp[KVTREE_MAX_FILENAME];
   int i;
-  for (i=0; i<indent; i++) {
+  for (i = 0; i < indent; i++) {
     tmp[i] = ' ';
   }
   tmp[indent] = '\0';
@@ -1629,7 +1751,7 @@ int kvtree_print(const kvtree* hash, int indent)
   if (hash != NULL) {
     kvtree_elem* elem;
     LIST_FOREACH(elem, hash, pointers) {
-      kvtree_elem_print(elem, indent+2);
+      kvtree_elem_print(elem, indent + 2, mode);
     }
   } else {
     printf("%sNULL LIST\n", tmp);
@@ -1637,7 +1759,13 @@ int kvtree_print(const kvtree* hash, int indent)
   return KVTREE_SUCCESS;
 }
 
-/* logs specified hash element to stdout for debugging */
+/** prints specified hash to stdout for debugging */
+int kvtree_print(const kvtree* hash, int indent)
+{
+  return kvtree_print_mode(hash, indent, KVTREE_PRINT_TREE);
+}
+
+/** logs specified hash element to stdout for debugging */
 static int kvtree_elem_log(const kvtree_elem* elem, int log_level, int indent)
 {
   char tmp[KVTREE_MAX_FILENAME];
@@ -1660,7 +1788,7 @@ static int kvtree_elem_log(const kvtree_elem* elem, int log_level, int indent)
   return KVTREE_SUCCESS;
 }
 
-/* prints specified hash to stdout for debugging */
+/** prints specified hash to stdout for debugging */
 int kvtree_log(const kvtree* hash, int log_level, int indent)
 {
   char tmp[KVTREE_MAX_FILENAME];
@@ -1680,16 +1808,15 @@ int kvtree_log(const kvtree* hash, int log_level, int indent)
   }
   return KVTREE_SUCCESS;
 }
+///@}
 
-#ifndef HIDE_TV
-/*
-=========================================
-Pretty print for TotalView debug window
-=========================================
-*/
+/* ================================================= */
+#ifdef HAVE_TV
+/** @name Pretty print for TotalView debug window */
+///@{
 
-/* This enables a nicer display when diving on a hash variable
- * under the TotalView debugger.  It requires TV 8.8 or later. */
+/** This enables a nicer display when diving on a hash variable
+ *  under the TotalView debugger.  It requires TV 8.8 or later. */
 
 #include "tv_data_display.h"
 
@@ -1746,4 +1873,5 @@ static int TV_ttf_display_type(const kvtree* hash)
 
   return TV_ttf_format_ok;
 }
+///@}
 #endif /* HIDE_TV */
