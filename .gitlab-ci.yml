@@ -1,21 +1,110 @@
-slurm-job:
-  tags:
-    - quartz
-    - batch
+tages:
+  - init
+  - build
+  - test
+  - cleanup
+
+################################################################################
+# Job templates
+################################################################################
+
+.base:
   variables:
-    LLNL_SLURM_SCHEDULER_PARAMETERS: "-N 3 -p pbatch"
+    GITLAB_SITE: "OLCF GitLab"
+    EXTERNAL_WORKDIR: /gpfs/wolf/proj-shared/csc337/veloc/ci/${CI_PIPELINE_ID}_${CI_BUILD_LABEL}
+  before_script:
+    - mkdir -pv ${EXTERNAL_WORKDIR}/source
+    - cd ${EXTERNAL_WORKDIR}/source
+    - module purge
+    - module load ${COMPILER} cmake git python/3.7.0 spectrum-mpi boost
+    - export CC=${CC_VAR} CXX=${CXX_VAR} FC=${FC_VAR}
+
+# Use a work directory on the shared filesystem accessible to compute nodes
+.init-step:
+  extends:
+    - .base
+  stage: init
+  tags: [nobatch]
   script:
+    - cd ..
+    - rm -rfv source
+    - echo $EXTERNAL_WORKDIR
+    - echo $CI_REPOSITORY_URL
+    - git clone -b ${CI_COMMIT_BRANCH} --depth=1  ${CI_REPOSITORY_URL} source
+
+.build-step:
+  extends:
+    - .base
+  stage: build
+  tags: [nobatch]
+  variables:
+    TMP_DIR: /tmp/veloc_${CC_VAR}
+  script:
+    - pip3 install --user wget bs4
+    - mkdir -p $PWD/../deploy
+    - rm -rf $TMP_DIR
     - cmake -DMPI=ON -DVELOC_RESOURCE_MANAGER=SLURM
     - make VERBOSE=1
-    - make check
+    # - ./auto-install.py --protocol socket_queue --temp ${TMP_DIR}  $PWD/../deploy
 
-lsf-job:
-  tags:
-    - lassen
-    - batch 
-  variables:
-    LLNL_LSF_SCHEDULER_PARAMETERS: "-nnodes 3 -q pbatch"
+.test-step:
+  extends:
+    - .base
+  stage: test
   script:
-    - cmake -DMPI=ON -DVELOC_RESOURCE_MANAGER=LSF
-    - make VERBOSE=1
+    - echo $LD_LIBRARY_PATH
+    - cd build
+#    - ctest -VV
     - make check
+  tags: [batch]
+
+.cleanup-step:
+  extends:
+    - .base
+  stage: cleanup
+  tags: [nobatch]
+  script:
+    - cd ${CI_PROJECT_DIR}
+    - rm -rf ${EXTERNAL_WORKDIR}
+
+
+################################################################################
+# XL + SMPI
+################################################################################
+################################################################################
+# GCC + SMPI
+################################################################################
+.ascent-gcc-smpi:
+  variables:
+    CI_BUILD_LABEL: ascent-gcc-smpi
+    COMPILER: gcc/8.1.1
+
+ascent-gcc-smpi-init:
+  extends:
+    - .ascent-gcc-smpi
+    - .init-step
+
+ascent-gcc-smpi-build:
+  variables:
+    CC_VAR: gcc
+    CXX_VAR: g++
+    FC_VAR: gfortran
+  extends:
+    - .ascent-gcc-smpi
+    - .build-step
+
+ascent-gcc-smpi-test:
+  extends:
+    - .ascent-gcc-smpi
+    - .test-step
+  tags:
+    - batch
+  variables:
+#    LSF_SCHEDULER_PARAMETERS: "-P CSC337 -W 1:00 -nnodes 2"
+    SCHEDULER_PARAMETERS: "-P CSC337 -W 1:00 -nnodes 3 -q pbatch"
+
+ascent-gcc-smpi-cleanup:
+  extends:
+    - .ascent-gcc-smpi
+    - .cleanup-step
+ 
