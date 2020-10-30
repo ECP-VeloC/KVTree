@@ -1,4 +1,4 @@
-tages:
+stages:
   - init
   - build
   - test
