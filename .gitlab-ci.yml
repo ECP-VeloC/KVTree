@@ -43,9 +43,8 @@ stages:
     - pip3 install --user wget bs4
     - mkdir -p $PWD/../deploy
     - rm -rf $TMP_DIR
-    - cmake -DMPI=ON -DVELOC_RESOURCE_MANAGER=SLURM
+    - cmake -DMPI=ON -DVELOC_RESOURCE_MANAGER=LSF
     - make VERBOSE=1
-    # - ./auto-install.py --protocol socket_queue --temp ${TMP_DIR}  $PWD/../deploy
 
 .test-step:
   extends:
@@ -53,7 +52,7 @@ stages:
   stage: test
   script:
     - echo $LD_LIBRARY_PATH
-    - make VERBOSE=1
+#    - make VERBOSE=1
     - make check
   tags: [batch]
 
