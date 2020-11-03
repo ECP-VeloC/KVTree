@@ -11,7 +11,7 @@ stages:
 .base:
   variables:
     GITLAB_SITE: "OLCF GitLab"
-    EXTERNAL_WORKDIR: /gpfs/wolf/proj-shared/csc337/veloc/ci/${CI_PIPELINE_ID}_${CI_BUILD_LABEL}
+    EXTERNAL_WORKDIR: /gpfs/wolf/proj-shared/csc337/kvtree/ci/${CI_PIPELINE_ID}_${CI_BUILD_LABEL}
   before_script:
     - mkdir -pv ${EXTERNAL_WORKDIR}/source
     - cd ${EXTERNAL_WORKDIR}/source
@@ -101,7 +101,7 @@ ascent-gcc-smpi-test:
     - batch
   variables:
 #    LSF_SCHEDULER_PARAMETERS: "-P CSC337 -W 1:00 -nnodes 2"
-    SCHEDULER_PARAMETERS: "-P CSC337 -W 1:00 -nnodes 3 -q pbatch"
+    SCHEDULER_PARAMETERS: "-P CSC337 -W 1:00 -nnodes 3"
 
 ascent-gcc-smpi-cleanup:
   extends:
