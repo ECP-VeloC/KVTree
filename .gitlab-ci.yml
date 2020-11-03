@@ -53,8 +53,7 @@ stages:
   stage: test
   script:
     - echo $LD_LIBRARY_PATH
-    - cd build
-#    - ctest -VV
+    - make VERBOSE=1
     - make check
   tags: [batch]
 
