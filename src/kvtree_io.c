@@ -135,12 +135,21 @@ int kvtree_close(const char* file, int fd)
   return KVTREE_SUCCESS;
 }
 
-int kvtree_file_lock_write(const char* file, int fd)
+/*
+ * Provide process-safe locking to a kvtree file
+ */
+int kvtree_file_lock_read_write(const char* file, int fd, int write)
 {
   #ifdef KVTREE_FILE_LOCK_USE_FLOCK
-    if (flock(fd, LOCK_EX) != 0) {
+    int op;
+    if (write) {
+        op = LOCK_EX;
+    } else {
+        op = LOCK_SH;
+    }
+    if (flock(fd, op) != 0) {
       kvtree_err("Failed to acquire file lock on %s: flock(%d, %d) errno=%d %s @ %s:%d",
-        file, fd, LOCK_EX, errno, strerror(errno), __FILE__, __LINE__
+        file, fd, op, errno, strerror(errno), __FILE__, __LINE__
       );
       return KVTREE_FAILURE;
     }
@@ -148,12 +157,16 @@ int kvtree_file_lock_write(const char* file, int fd)
 
   #ifdef KVTREE_FILE_LOCK_USE_FCNTL
     struct flock lck;
-    lck.l_type = F_WRLCK;
-    lck.l_whence = 0;
+    if (write) {
+      lck.l_type = F_WRLCK;
+    } else {
+      lck.l_type = F_RDLCK;
+    }
+    lck.l_whence = SEEK_SET;
     lck.l_start = 0L;
     lck.l_len = 0L; //locking the entire file
 
-    if(fcntl(fd, F_SETLK, &lck) < 0) {
+    if(fcntl(fd, F_SETLKW, &lck) < 0) {
       kvtree_err("Failed to acquire file read lock on %s: fnctl(%d, %d) errno=%d %s @ %s:%d",
         file, fd, F_WRLCK, errno, strerror(errno), __FILE__, __LINE__
       );
@@ -194,7 +207,7 @@ int kvtree_file_unlock(const char* file, int fd)
 }
 
 /* opens specified file and waits on a lock before returning the file descriptor */
-int kvtree_open_with_lock(const char* file, int flags, mode_t mode)
+int kvtree_open_with_lock(const char* file, int flags, mode_t mode, int write)
 {
   /* open the file */
   int fd = kvtree_open(file, flags, mode);
@@ -205,8 +218,8 @@ int kvtree_open_with_lock(const char* file, int flags, mode_t mode)
     return fd;
   }
 
-  /* acquire an exclusive file lock */
-  int ret = kvtree_file_lock_write(file, fd);
+  /* acquire shared (write=0) or exclusive (write=1) file lock */
+  int ret = kvtree_file_lock_read_write(file, fd, write);
   if (ret != KVTREE_SUCCESS) {
     close(fd);
     return ret;
