@@ -257,7 +257,12 @@ int kvtree_read_file(const char* file, kvtree* hash);
 /** given a filename and hash, lock/open/read/close/unlock the file storing its contents in the hash */
 int kvtree_read_with_lock(const char* file, kvtree* hash);
 
-/** given a filename and hash, lock the file, open it, and read it into hash, set fd to the opened file descriptor */
+/** given a filename and hash, lock/open/read/close/unlock the file storing its contents in the hash */
+int kvtree_write_with_lock(const char* file, kvtree* hash);
+
+/** given a filename and hash, lock the file, open it, and read it into hash, set fd to the opened file descriptor.
+ * Note that this function actually acquires a write lock, not a read lock, allowing you do a read-modify-write
+ * before you unlock it.  */
 int kvtree_lock_open_read(const char* file, int* fd, kvtree* hash);
 
 /** given a filename, an opened file descriptor, and a hash, overwrite file with hash, close, and unlock file */

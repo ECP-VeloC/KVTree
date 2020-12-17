@@ -67,8 +67,9 @@ int kvtree_close(const char* file, int fd);
 int kvtree_file_lock_write(const char* file, int fd);
 int kvtree_file_unlock(const char* file, int fd);
 
-/** opens specified file and waits on for an exclusive lock before returning the file descriptor */
-int kvtree_open_with_lock(const char* file, int flags, mode_t mode);
+/** opens specified file and waits for a shared lock if write=0 or an exclusive
+ *  lock if write=1 before returning the file descriptor */
+int kvtree_open_with_lock(const char* file, int flags, mode_t mode, int write);
 
 /** unlocks the specified file descriptor and then closes the file */
 int kvtree_close_with_unlock(const char* file, int fd);

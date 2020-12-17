@@ -24,6 +24,11 @@ ADD_TEST(roundtrip_tests test_kvtree)
 FIND_PROGRAM(PRINT_TEST ${CMAKE_CURRENT_SOURCE_DIR}/print_test)
 ADD_TEST(NAME print_test COMMAND ${PRINT_TEST} ${PROJECT_BINARY_DIR}/src/kvtree_print ${CMAKE_CURRENT_SOURCE_DIR}/files)
 
+# Test multiple processes writing to the same file at the same time
+ADD_EXECUTABLE(test_kvtree_write_locking test_kvtree_write_locking.c)
+TARGET_LINK_LIBRARIES(test_kvtree_write_locking ${KVTREE_EXTERNAL_LIBS} kvtree)
+ADD_TEST(NAME test_kvtree_write_locking COMMAND test_kvtree_write_locking)
+
 IF(MPI_FOUND)
 
 ADD_EXECUTABLE(kvtree_bcast_test test_kvtree_bcast.c)

@@ -265,6 +265,7 @@ kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
   }
 
   kvtree* h = hash;
+  char *rest = NULL;
 
   /* make a copy of the format specifier, since strtok will clobber
    * it */
@@ -280,10 +281,10 @@ kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
   char* token = NULL;
 
   /* count how many keys we have */
-  token = strtok(format_copy, search);
+  token = strtok_r(format_copy, search, &rest);
   int count = 0;
   while (token != NULL) {
-    token = strtok(NULL, search);
+    token = strtok_r(NULL, search, &rest);
     count++;
   }
 
@@ -303,7 +304,7 @@ kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
    * string and look up the hash for that key */
   va_list args;
   va_start(args, format);
-  token = strtok(format_copy, search);
+  token = strtok_r(format_copy, search, &rest);
   int i = 0;
   while (i < count && token != NULL && h != NULL) {
     /* interpret the format and convert the current key argument to
@@ -360,7 +361,7 @@ kvtree* kvtree_setf(kvtree* hash, kvtree* hash_value, const char* format, ...)
     }
 
     /* get the next format string */
-    token = strtok(NULL, search);
+    token = strtok_r(NULL, search, &rest);
     i++;
   }
   va_end(args);
@@ -381,6 +382,7 @@ kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
   }
 
   const kvtree* h = hash;
+  char* rest = NULL;
 
   /* make a copy of the format specifier, since strtok clobbers it */
   char* format_copy = strdup(format);
@@ -395,10 +397,10 @@ kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
   char* token = NULL;
 
   /* count how many keys we have */
-  token = strtok(format_copy, search);
+  token = strtok_r(format_copy, search, &rest);
   int count = 0;
   while (token != NULL) {
-    token = strtok(NULL, search);
+    token = strtok_r(NULL, search, &rest);
     count++;
   }
 
@@ -417,7 +419,7 @@ kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
    * string and look up the hash for that key */
   va_list args;
   va_start(args, format);
-  token = strtok(format_copy, search);
+  token = strtok_r(format_copy, search, &rest);
   int i = 0;
   while (i < count && token != NULL && h != NULL) {
     /* interpret the format and convert the current key argument to
@@ -459,7 +461,7 @@ kvtree* kvtree_getf(const kvtree* hash, const char* format, ...)
     h = kvtree_get(h, key);
 
     /* get the next format string */
-    token = strtok(NULL, search);
+    token = strtok_r(NULL, search, &rest);
     i++;
   }
   va_end(args);
@@ -1294,6 +1296,8 @@ ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
 
   /* check that we have a hash, a file name, and a file descriptor */
   if (file == NULL || fd < 0 || hash == NULL) {
+    kvtree_err("Bad file/fd/hash in %s @ %s:%d",
+      file, __FILE__, __LINE__);
     return -1;
   }
 
@@ -1301,6 +1305,8 @@ ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
   char header[KVTREE_FILE_HASH_HEADER_SIZE];
   nread = kvtree_read_attempt(file, fd, header, KVTREE_FILE_HASH_HEADER_SIZE);
   if (nread != KVTREE_FILE_HASH_HEADER_SIZE) {
+    kvtree_err("Sizes %zu != %d in %s @ %s:%d",
+      nread, KVTREE_FILE_HASH_HEADER_SIZE, file, __FILE__, __LINE__);
     return -1;
   }
 
@@ -1351,9 +1357,8 @@ ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
   if (remainder > 0) {
     nread = kvtree_read_attempt(file, fd, buf + size, remainder);
     if (nread != remainder) {
-      kvtree_err("Failed to read file %s @ %s:%d",
-        file, __FILE__, __LINE__
-      );
+      kvtree_err("Failed to read file %s (%zu != %zu: filesize %zu) @ %s:%d",
+        file, nread, remainder, filesize, __FILE__, __LINE__);
       kvtree_free(&buf);
       return -1;
     }
@@ -1438,15 +1443,21 @@ int kvtree_read_file(const char* file, kvtree* hash)
   return rc;
 }
 
-/** given a filename and hash, lock/open/read/close/unlock the file */
-int kvtree_read_with_lock(const char* file, kvtree* hash)
+/*
+ * Boilerplate code to check that 'hash' is valid, open 'file'
+ * and acquire a write lock.
+ *
+ * Return a fd for 'file' >= 0 on success, -1 on failure.
+ */
+static
+int kvtree_read_write_with_lock(const char* file, kvtree* hash, int write)
 {
   /* check that we got a filename */
   if (file == NULL) {
     kvtree_err("No filename specified @ %s:%d",
       __FILE__, __LINE__
     );
-    return KVTREE_FAILURE;
+    return -1;
   }
 
   /* check that we got a hash to read data into */
@@ -1454,15 +1465,58 @@ int kvtree_read_with_lock(const char* file, kvtree* hash)
     kvtree_err("No hash provided to read data into @ %s:%d",
       __FILE__, __LINE__
     );
-    return KVTREE_FAILURE;
+    return -1;
   }
 
   /* open file with lock for read / write access */
   mode_t mode_file = kvtree_getmode(1, 1, 0);
-  int fd = kvtree_open_with_lock(file, O_RDWR | O_CREAT, mode_file);
+  int fd = kvtree_open_with_lock(file, O_RDWR | O_CREAT, mode_file, write);
+
+  return fd;
+}
+
+/*
+ * Read the kvtree from 'file' into 'hash'.  This is the locking version that
+ * only allows one reader/writer to 'file' at a time.
+ */
+int kvtree_read_with_lock(const char* file, kvtree* hash)
+{
+  int fd = kvtree_read_write_with_lock(file, hash, 0);
   if (fd >= 0) {
+    int rc;
     /* read the file into the hash */
-    kvtree_read_fd(file, fd, hash);
+    rc = kvtree_read_fd(file, fd, hash);
+    if (rc == -1) {
+      kvtree_err("Couldn't read file @ %s:%d", __FILE__, __LINE__);
+      kvtree_close_with_unlock(file, fd);
+      return KVTREE_FAILURE;
+    }
+
+    /* close the file and release the lock */
+    rc = kvtree_close_with_unlock(file, fd);
+    if (rc != 0) {
+      return KVTREE_FAILURE;
+    }
+
+    return KVTREE_SUCCESS;
+  } else {
+    kvtree_err("Failed to open file with lock %s @ %s:%d",
+      file, __FILE__, __LINE__);
+  }
+
+  return KVTREE_FAILURE;
+}
+
+/*
+ * Write the kvtree from 'hash' to 'file'.  This is the locking version that
+ * only allows one reader/writer to 'file' at a time.
+ */
+int kvtree_write_with_lock(const char* file, kvtree* hash)
+{
+  int fd = kvtree_read_write_with_lock(file, hash, 1);
+  if (fd >= 0) {
+    /* write the file into the hash */
+    kvtree_write_fd(file, fd, hash);
 
     /* close the file and release the lock */
     kvtree_close_with_unlock(file, fd);
@@ -1511,7 +1565,12 @@ int kvtree_lock_open_read(const char* file, int* fd, kvtree* hash)
 
   /* open file with lock for read / write access */
   mode_t mode_file = kvtree_getmode(1, 1, 0);
-  *fd = kvtree_open_with_lock(file, O_RDWR | O_CREAT, mode_file);
+
+  /*
+   * NOTE: even though this function is kvtree_lock_open_read(), we still
+   * take a write lock below since our code uses it for a read-modify-write.
+   */
+  *fd = kvtree_open_with_lock(file, O_RDWR | O_CREAT, mode_file, 1);
   if (*fd >= 0) {
     /* read the file into the hash */
     kvtree_read_fd(file, *fd, hash);
