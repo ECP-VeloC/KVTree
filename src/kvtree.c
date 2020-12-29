@@ -107,7 +107,39 @@ static kvtree_elem* kvtree_elem_init(kvtree_elem* elem, const char* key, kvtree*
   return elem;
 }
 
-/** return size of hash (number of keys) */
+/**
+ * Return size of hash (number of keys)
+ *
+ * For example, if your tree was:
+ *
+ * NAME
+ *   axl_cp
+ * TYPE
+ *   2
+ * STATE_FILE
+ *   state_file
+ * STATE
+ *   4
+ * STATUS
+ *   4
+ * FILE
+ *   hello.txt
+ *     STATUS
+ *       3
+ *     SIZE
+ *       6
+ *     GID
+ *       57592
+ *     UID
+ *       57592
+ *     MODE
+ *       33268
+ *     DEST
+ *       hello2.txt._AXL
+ *
+ * This would return 6 since there's six top level elements:
+ *     "NAME", "TYPE", "STATE_FILE", "STATE", "STATUS", "FILE".
+ */
 int kvtree_size(const kvtree* hash)
 {
   int count = 0;
@@ -1669,6 +1701,8 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
 int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
 {
   int rc = KVTREE_SUCCESS;
+  /* record up to 8K entries per file */
+  long entries_per_file = 8192;
 
   /* we hardcode this to be two levels deep */
 
@@ -1682,7 +1716,18 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
   /* iterate over each rank to record its info */
   int writer = 0;
   int max_rank = -1;
+
   kvtree_elem* elem = kvtree_elem_first(data);
+
+  /*
+   * KVTREE_ENTRIES_PER_FILE is only used for testing.  Specifically, you can
+   * set it to something low like 1 to force kvwrite_write_to_gather() to write
+   * multiple kvtree files.
+   */
+  if (getenv("KVTREE_ENTRIES_PER_FILE")) {
+    entries_per_file = atol(getenv("KVTREE_ENTRIES_PER_FILE"));
+  }
+
   while (elem != NULL) {
     /* create a hash to record an entry from each rank */
     kvtree* entries = kvtree_new();
@@ -1691,9 +1736,8 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
     /* record the total number of ranks in each file */
     kvtree_set_kv_int(entries, "RANKS", ranks);
 
-    /* record up to 8K entries */
     int count = 0;
-    while (count < 8192) {
+    while (count < entries_per_file) {
       /* get rank id */
       int rank = kvtree_elem_key_int(elem);
       if (rank > max_rank) {

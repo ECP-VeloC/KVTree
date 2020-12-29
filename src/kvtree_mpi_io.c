@@ -131,8 +131,22 @@ static unsigned long kvtree_write_gather_map(
 {
   int rc = KVTREE_SUCCESS;
 
+  if (offset != 0) {
+    /*
+     * While we technically can write to a non-zero offset, there were issues
+     * with doing so with NFS, and so we disable it for now.  It will break
+     * kvtree_read_scatter_single() if we enable it too.
+     */
+    kvtree_abort(1, "Attempt to write a non-zero offset (got %lu) for %s/%s @ %s:%d",
+      offset, prefix, file, __FILE__, __LINE__
+    );
+    return KVTREE_FAILURE;
+  }
+
   /* get name of this process */
   int rank_world, ranks_world;
+
+
   MPI_Comm_rank(comm, &rank_world);
   MPI_Comm_size(comm, &ranks_world);
 

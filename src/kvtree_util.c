@@ -9,6 +9,9 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdint.h>
+#include <string.h>
+#include <libgen.h>
+#include <dirent.h>
 
 /* need at least version 8.5 of queue.h from Berkeley */
 #include "queue.h"
@@ -224,4 +227,125 @@ int kvtree_util_get_ptr(const kvtree* hash, const char* key, void** val)
   }
 
   return rc;
+}
+
+/*
+ * Given a prefix passed to a kvtree_write_gather() (like "/tmp/rank2file",
+ * read all the rank data from all the scattered subfiles, and construct a
+ * kvtree in 'data'.  'data' will look something like:
+ *
+ *       26
+ *         FILE
+ *           ckpt.1/rank_26.ckpt
+ *       24
+ *         FILE
+ *           ckpt.1/rank_24.ckpt
+ *       25
+ *         FILE
+ *           ckpt.1/rank_25.ckpt
+ *       18
+ *         FILE
+ *           ckpt.1/rank_18.ckpt
+ *       ...
+ *
+ *  ... with each top-level element being the rank number.
+ */
+int kvtree_read_scatter_single(const char* prefix, kvtree* data)
+{
+  int rc = KVTREE_SUCCESS;
+  unsigned long level, expected_ranks, actual_ranks = 0;
+  char *prefix_dir, *prefix_dir_copy = NULL, *prefix_file, *prefix_file_copy = NULL;
+  char tmp[PATH_MAX], pattern[PATH_MAX];
+  kvtree *subfile_tree = NULL, *subfile_rank_tree = NULL;
+  kvtree *final_tree = kvtree_new();
+
+  /*
+   * Look at the high level kvtree and get the total number of ranks to
+   * expect.
+   */
+  rc = kvtree_read_file(prefix, final_tree);
+  if (rc != KVTREE_SUCCESS) {
+    kvtree_free(&final_tree);
+    return rc;
+  }
+
+  rc = kvtree_util_get_unsigned_long(final_tree, "RANKS", &expected_ranks);
+  if (rc != KVTREE_SUCCESS) {
+    kvtree_free(&final_tree);
+    return rc;
+  }
+  kvtree_delete(&final_tree);
+
+  /* Start construction of the final tree that we will return */
+  final_tree = kvtree_new();
+
+  /* Look at all the subfiles with our prefix and read in the file lists */
+  prefix_dir_copy = strdup(prefix);
+  prefix_dir = dirname(prefix_dir_copy);
+  prefix_file_copy = strdup(prefix);
+  prefix_file = basename(prefix_file_copy);
+
+  DIR *d;
+  struct dirent *dir;
+  d = opendir(prefix_dir);
+  if (!d) {
+    rc = KVTREE_FAILURE;
+    goto end;
+  }
+
+  sprintf(pattern, "%s.%%lu.%%lu", prefix_file);
+  pattern[sizeof(pattern) - 1] = '\0';
+
+  /* For each file/dir in our prefix dir */
+  while ((dir = readdir(d)) != NULL) {
+    unsigned long num1, num2;
+    /*
+     * Search for any file starting with "prefix_file."
+     * like "rank2file.".
+     */
+
+    /* Is this one of our subfiles?  It should have .x.y in the extension */
+    rc = sscanf(dir->d_name, pattern, &num1, &num2);
+    if (rc == 2) {  /* Did we get both numbers in the extension? */
+      /* subfile matches */
+
+      /* Construct the full path to the subfile kvtree */
+      memset(tmp, 0, sizeof(tmp));
+      snprintf(tmp, sizeof(tmp), "%s/%s", prefix_dir, dir->d_name);
+      tmp[sizeof(tmp) - 1] = '\0';
+
+      /* Read in the subfile */
+      subfile_rank_tree = NULL;
+      subfile_tree = kvtree_new();
+
+      rc = kvtree_read_file(tmp, subfile_tree);
+      if (rc == KVTREE_SUCCESS) {
+        /* Sanity: each subfile we want will have LEVEL=0 */
+        rc = kvtree_util_get_unsigned_long(subfile_tree, "LEVEL", &level);
+        if (rc == KVTREE_SUCCESS && level == 0) {
+          /* Break off and remove the "RANK" subtree from the rank2file tree */
+          subfile_rank_tree = kvtree_extract(subfile_tree, "RANK");
+          if (subfile_rank_tree) {
+            if (kvtree_merge(final_tree, subfile_rank_tree) == KVTREE_SUCCESS) {
+              actual_ranks += kvtree_size(subfile_rank_tree);
+            }
+          }
+        }
+      }
+      kvtree_delete(&subfile_tree);
+    }
+  }
+  closedir(d);
+  kvtree_merge(data, final_tree);
+  rc = KVTREE_SUCCESS;
+
+end:
+  free(prefix_dir_copy);
+  free(prefix_file_copy);
+  kvtree_delete(&final_tree);
+  if (rc != KVTREE_SUCCESS || actual_ranks != expected_ranks) {
+    return KVTREE_FAILURE;
+  }
+
+  return KVTREE_SUCCESS;
 }

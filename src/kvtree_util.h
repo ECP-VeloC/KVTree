@@ -59,6 +59,10 @@ int kvtree_util_get_int64(const kvtree* hash, const char* key, int64_t* value);
 int kvtree_util_get_double(const kvtree* hash, const char* key, double* value);
 
 int kvtree_util_get_ptr(const kvtree* hash, const char* key, void** value);
+
+/* Read a rank2file file and all of its subfiles into a single kvtree */
+int kvtree_read_scatter_single(const char* prefix, kvtree* data);
+
 ///@}
 
 /* enable C++ codes to include this header directly */
