@@ -31,6 +31,11 @@ ADD_TEST(NAME test_kvtree_write_locking COMMAND test_kvtree_write_locking)
 
 IF(MPI_FOUND)
 
+CONFIGURE_FILE(kvtree_read_scatter_single_test.sh ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+ADD_EXECUTABLE(kvtree_read_scatter_single_test kvtree_read_scatter_single_test.c)
+TARGET_LINK_LIBRARIES(kvtree_read_scatter_single_test ${KVTREE_EXTERNAL_LIBS} kvtree)
+KVTREE_ADD_TEST(kvtree_read_scatter_single_test.sh ${CMAKE_CURRENT_SOURCE_DIR}/files "")
+
 ADD_EXECUTABLE(kvtree_bcast_test test_kvtree_bcast.c)
 TARGET_LINK_LIBRARIES(kvtree_bcast_test ${KVTREE_EXTERNAL_LIBS} kvtree)
 KVTREE_ADD_TEST(kvtree_bcast_test 256 "")

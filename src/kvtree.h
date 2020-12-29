@@ -280,6 +280,9 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash);
 int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks);
 ///@}
 
+/* Read a scatter/gather file and all of its subfiles into a single kvtree */
+int kvtree_read_scatter_single(const char* prefix, kvtree* data);
+
 /********************************************************/
 /** \name Print hash and elements to stdout for debugging */
 ///@{

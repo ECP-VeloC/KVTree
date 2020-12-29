@@ -18,6 +18,11 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
+#include <libgen.h>
+#include <dirent.h>
+#include <limits.h>
+#include <regex.h>
+
 
 /* need at least version 8.5 of queue.h from Berkeley */
 #include "queue.h"
@@ -107,7 +112,39 @@ static kvtree_elem* kvtree_elem_init(kvtree_elem* elem, const char* key, kvtree*
   return elem;
 }
 
-/** return size of hash (number of keys) */
+/**
+ * Return size of hash (number of keys)
+ *
+ * For example, if your tree was:
+ *
+ * NAME
+ *   axl_cp
+ * TYPE
+ *   2
+ * STATE_FILE
+ *   state_file
+ * STATE
+ *   4
+ * STATUS
+ *   4
+ * FILE
+ *   hello.txt
+ *     STATUS
+ *       3
+ *     SIZE
+ *       6
+ *     GID
+ *       57592
+ *     UID
+ *       57592
+ *     MODE
+ *       33268
+ *     DEST
+ *       hello2.txt._AXL
+ *
+ * This would return 6 since there's six top level elements:
+ *     "NAME", "TYPE", "STATE_FILE", "STATE", "STATUS", "FILE".
+ */
 int kvtree_size(const kvtree* hash)
 {
   int count = 0;
@@ -1669,6 +1706,17 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
 int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
 {
   int rc = KVTREE_SUCCESS;
+  /* record up to 8K entries per file */
+  long entries_per_file = 8192;
+
+  /*
+   * KVTREE_ENTRIES_PER_FILE is only used for testing.  Specifically, you can
+   * set it to something low like 1 to force kvwrite_write_to_gather() to write
+   * multiple kvtree files.
+   */
+  if (getenv("KVTREE_ENTRIES_PER_FILE")) {
+    entries_per_file = atol(getenv("KVTREE_ENTRIES_PER_FILE"));
+  }
 
   /* we hardcode this to be two levels deep */
 
@@ -1691,9 +1739,8 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
     /* record the total number of ranks in each file */
     kvtree_set_kv_int(entries, "RANKS", ranks);
 
-    /* record up to 8K entries */
     int count = 0;
-    while (count < 8192) {
+    while (count < entries_per_file) {
       /* get rank id */
       int rank = kvtree_elem_key_int(elem);
       if (rank > max_rank) {
@@ -1750,6 +1797,137 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
   return rc;
 }
 ///@}
+
+/*
+ * Given a prefix passed to a kvtree_write_gather() (like "/tmp/rank2file",
+ * read all the rank data from all the scattered subfiles, and construct a
+ * kvtree in 'data'.  'data' will look something like:
+ *
+ *       26
+ *         FILE
+ *           ckpt.1/rank_26.ckpt
+ *       24
+ *         FILE
+ *           ckpt.1/rank_24.ckpt
+ *       25
+ *         FILE
+ *           ckpt.1/rank_25.ckpt
+ *       18
+ *         FILE
+ *           ckpt.1/rank_18.ckpt
+ *       ...
+ *
+ *  ... with each top-level element being the rank number.
+ */
+int kvtree_read_scatter_single(const char* prefix, kvtree* data)
+{
+  /*
+   * Read in high level kvtree.
+   */
+  kvtree* final_tree = kvtree_new();
+  int rc = kvtree_read_file(prefix, final_tree);
+  if (rc != KVTREE_SUCCESS) {
+    kvtree_free(&final_tree);
+    kvtree_err("Couldn't read in high level kvtree file %s\n", prefix);
+    return rc;
+  }
+
+  unsigned long expected_ranks;
+  rc = kvtree_util_get_unsigned_long(final_tree, "RANKS", &expected_ranks);
+  if (rc != KVTREE_SUCCESS) {
+    kvtree_free(&final_tree);
+    kvtree_err("Couldn't get RANKS for %s\n", prefix);
+    return rc;
+  }
+  kvtree_delete(&final_tree);
+
+  /* Start construction of the final tree that we will return */
+  final_tree = kvtree_new();
+
+  /* Look at all the subfiles with our prefix and read in the file lists */
+  char* prefix_dir;
+  char* prefix_dir_copy = NULL;
+  char* prefix_file;
+  char* prefix_file_copy = NULL;
+  prefix_dir_copy = strdup(prefix);
+  prefix_dir = dirname(prefix_dir_copy);
+  prefix_file_copy = strdup(prefix);
+  prefix_file = basename(prefix_file_copy);
+
+  /* Create our regex to match our prefix files */
+  char pattern[PATH_MAX];
+  snprintf(pattern, sizeof(pattern), "^%s\\.0\\.[0-9]+$", prefix_file);
+  pattern[sizeof(pattern) - 1] = '\0';
+  regex_t regex;
+  rc = regcomp(&regex, pattern, REG_EXTENDED);
+  if (rc) {
+    rc = KVTREE_FAILURE;
+    goto end;
+  }
+
+  DIR* d;
+  struct dirent* dir;
+  d = opendir(prefix_dir);
+  if (!d) {
+    rc = KVTREE_FAILURE;
+    goto end;
+  }
+
+  char tmp[PATH_MAX];
+  unsigned long actual_ranks = 0;
+  /* For each file/dir in our prefix dir */
+  while ((dir = readdir(d)) != NULL) {
+    /*
+     * Search for any file starting with "prefix_file."
+     * like "rank2file.".
+     */
+    /* Is this one of our subfiles?  It should have .0.x in the extension */
+    rc = regexec(&regex, dir->d_name, 0, NULL, 0);
+    if (rc == 0) {  /* Did we get both numbers in the extension? */
+      /* subfile matches */
+
+      /* Construct the full path to the subfile kvtree */
+      memset(tmp, 0, sizeof(tmp));
+      snprintf(tmp, sizeof(tmp), "%s/%s", prefix_dir, dir->d_name);
+      tmp[sizeof(tmp) - 1] = '\0';
+
+      /* Read in the subfile */
+      kvtree* subfile_tree = NULL;
+      kvtree* subfile_rank_tree = NULL;
+      subfile_rank_tree = NULL;
+      subfile_tree = kvtree_new();
+      rc = kvtree_read_file(tmp, subfile_tree);
+      if (rc == KVTREE_SUCCESS) {
+        /* Sanity: each subfile we want will have LEVEL=0 */
+        unsigned long level;
+        rc = kvtree_util_get_unsigned_long(subfile_tree, "LEVEL", &level);
+        if (rc == KVTREE_SUCCESS && level == 0) {
+          /* Break off and remove the "RANK" subtree from the rank2file tree */
+          subfile_rank_tree = kvtree_extract(subfile_tree, "RANK");
+          if (subfile_rank_tree) {
+            if (kvtree_merge(final_tree, subfile_rank_tree) == KVTREE_SUCCESS) {
+              actual_ranks += kvtree_size(subfile_rank_tree);
+            }
+          }
+        }
+      }
+      kvtree_delete(&subfile_tree);
+    }
+  }
+  closedir(d);
+  kvtree_merge(data, final_tree);
+  rc = KVTREE_SUCCESS;
+
+end:
+  kvtree_free(&prefix_dir_copy);
+  kvtree_free(&prefix_file_copy);
+  kvtree_delete(&final_tree);
+  if (rc != KVTREE_SUCCESS || actual_ranks != expected_ranks) {
+    return KVTREE_FAILURE;
+  }
+
+  return KVTREE_SUCCESS;
+}
 
 /* ================================================= */
 /** @name Print hash and elements to stdout for debugging */
