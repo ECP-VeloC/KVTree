@@ -3,6 +3,7 @@
 #include "kvtree.h"
 #include "kvtree_util.h"
 #include "kvtree_helpers.h"
+#include "kvtree_err.h"
 
 #include <stdio.h>
 #include <stdlib.h>
