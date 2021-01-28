@@ -25,8 +25,7 @@ Here are the contents of an example root::
 
 The LEVEL field lists the level at which the current file is located in the tree.
 The leaves of the tree are at level 0.
-The RANKS field specifies the number of ranks the current file
-(and its associated subtree) contains information for.
+The RANKS field specifies the total number of ranks represented by the complete file set.
 
 For levels that are higher than level 0, the RANK kvtree
 contains information about other files to be read.
@@ -63,7 +62,8 @@ Here are the contents of an example file at level 0::
     3
       <kvtree_from_rank_3>
 
-Again, the number of ranks that this file contains information for is recorded under the RANKS field.
+Again, the total number of ranks used to produce the set is recorded in the RANKS field,
+which may be more than the ranks listed in a particular file.
 
 There are entries for specific ranks under the RANK kvtree,
 which is indexed by rank id within MPI_COMM_WORLD.

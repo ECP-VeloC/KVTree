@@ -27,7 +27,7 @@ static int pick_writer(
   int level,
   unsigned long count,
   int* outwriter,
-  int* outranks,
+  int* outallranks,
   MPI_Comm comm)
 {
   /* use a segment size of 1MB */
@@ -113,10 +113,10 @@ static int pick_writer(
   /* set output parameters */
   *outwriter = send[KVTREE_MAP_RANK];
 
-  /* determine whether we've finished, the last rank knows the total
-   * in the group */
-  *outranks = send[KVTREE_MAP_RANKS];
-  MPI_Bcast(outranks, 1, MPI_INT, ranks-1, comm);
+  /* determine whether we've finished,
+   * only the last rank knows the total */
+  *outallranks = (send[KVTREE_MAP_RANKS] == ranks);
+  MPI_Bcast(outallranks, 1, MPI_INT, ranks-1, comm);
 
   return KVTREE_SUCCESS;
 }
@@ -146,8 +146,8 @@ static unsigned long kvtree_write_gather_map(
   }
 
   /* pick writers so that we send roughly 1MB of data to each */
-  int writer, ranks;
-  pick_writer(level, pack_size, &writer, &ranks, comm);
+  int writer, allranks;
+  pick_writer(level, pack_size, &writer, &allranks, comm);
 
   /* create new hashes to send and receive data */
   kvtree* send = kvtree_new();
@@ -178,21 +178,21 @@ static unsigned long kvtree_write_gather_map(
   kvtree_delete(&recv);
   kvtree_delete(&send);
 
-  /* create file name for rank2file index */
+  /* define file name */
   char mapfile[1024];
-  if (ranks < ranks_world) {
-    /* for all lower level maps we append a level id and writer id */
-    snprintf(mapfile, sizeof(mapfile), ".%d.%d", level, writer);
-  } else {
+  if (allranks) {
     /* at the top most level, simplify the name so we can find it */
     snprintf(mapfile, sizeof(mapfile), "%s", "");
+  } else {
+    /* for all lower level maps we append a level id and writer id */
+    snprintf(mapfile, sizeof(mapfile), ".%d.%d", level, writer);
   }
 
   char mappath[1024];
   snprintf(mappath, sizeof(mappath), "%s%s", prefix, mapfile);
 
   /* call gather recursively if there's another level */
-  if (ranks < ranks_world) {
+  if (! allranks) {
      /* gather file names to higher level */
      unsigned long newoffset = 0;
      int newlevel = level + 1;
@@ -215,8 +215,8 @@ static unsigned long kvtree_write_gather_map(
       /* store level value in hash */
       kvtree_util_set_int(save, "LEVEL", level);
 
-      /* record total number within each level */
-      kvtree_util_set_int(save, "RANKS", ranks);
+      /* record global number of ranks */
+      kvtree_util_set_int(save, "RANKS", ranks_world);
 
       /* persist hash */
       void* buf = NULL;
@@ -270,9 +270,9 @@ int kvtree_write_gather(
   MPI_Comm_size(comm, &ranks_world);
 
   /* pick our writer so that we send roughly 1MB of data to each */
-  int writer, ranks;
+  int writer, allranks;
   unsigned long pack_size = (unsigned long) kvtree_pack_size(data);
-  pick_writer(1, pack_size, &writer, &ranks, comm);
+  pick_writer(1, pack_size, &writer, &allranks, comm);
 
   /* create send and receive hashes */
   kvtree* send = kvtree_new();
@@ -298,7 +298,7 @@ int kvtree_write_gather(
   kvtree_delete(&recv);
   kvtree_delete(&send);
 
-  /* create file name for rank2file index */
+  /* define file name */
   char mapfile[1024];
   char mappath[1024];
   snprintf(mapfile, sizeof(mapfile), ".0.%d", writer);
@@ -325,8 +325,8 @@ int kvtree_write_gather(
       /* store level value in hash */
       kvtree_util_set_int(save, "LEVEL", 0);
 
-      /* store number of ranks at this level */
-      kvtree_util_set_int(save, "RANKS", ranks);
+      /* record global number of ranks */
+      kvtree_util_set_int(save, "RANKS", ranks_world);
 
       /* persist and compress hash */
       void* buf;
@@ -399,7 +399,7 @@ static int kvtree_read_scatter_map(
       /* close the file */
       kvtree_close(file, fd);
     } else {
-      kvtree_err("Failed to open rank2file map %s @ %s:%d",
+      kvtree_err("Failed to open file %s @ %s:%d",
         file, __FILE__, __LINE__
       );
       rc = KVTREE_FAILURE;
@@ -509,7 +509,7 @@ int kvtree_read_scatter(
   MPI_Comm_rank(comm, &rank_world);
   MPI_Comm_size(comm, &ranks_world);
 
-  /* build path to rank2file map */
+  /* build path to file */
   char mappath[1024];
   snprintf(mappath, sizeof(mappath), "%s", prefix);
 
@@ -544,7 +544,7 @@ int kvtree_read_scatter(
       kvtree_lseek(file, fd, offset, SEEK_SET);
       ssize_t readsize = kvtree_read_fd(file, fd, save);
       if (readsize < 0) {
-        kvtree_err("Failed to read rank2file map file %s @ %s:%d",
+        kvtree_err("Failed to read file %s @ %s:%d",
           file, __FILE__, __LINE__
         );
         rc = KVTREE_FAILURE;
@@ -569,7 +569,7 @@ int kvtree_read_scatter(
       /* close the file */
       kvtree_close(file, fd);
     } else {
-      kvtree_err("Failed to open rank2file map %s @ %s:%d",
+      kvtree_err("Failed to open %s @ %s:%d",
         file, __FILE__, __LINE__
       );
       rc = KVTREE_FAILURE;
