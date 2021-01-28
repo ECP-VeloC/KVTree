@@ -1656,7 +1656,7 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
   /* sort so that elements are ordered by rank value */
   kvtree_sort_int(data, KVTREE_SORT_ASCENDING);
 
-  /* create hash for primary rank2file map and encode level */
+  /* create hash for primary map and encode level */
   kvtree* files_hash = kvtree_new();
   kvtree_set_kv_int(files_hash, "LEVEL", 1);
 
@@ -1668,6 +1668,9 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
     /* create a hash to record an entry from each rank */
     kvtree* entries = kvtree_new();
     kvtree_set_kv_int(entries, "LEVEL", 0);
+
+    /* record the total number of ranks in each file */
+    kvtree_set_kv_int(entries, "RANKS", ranks);
 
     /* record up to 8K entries */
     int count = 0;
@@ -1691,14 +1694,11 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
       }
     }
 
-    /* record the number of ranks */
-    kvtree_set_kv_int(entries, "RANKS", count);
-
     /* build name for part file */
     char filename[1024];
     snprintf(filename, sizeof(filename), "%s.0.%d", prefix, writer);
 
-    /* write hash to file rank2file part */
+    /* write hash to file */
     if (kvtree_write_file(filename, entries) != KVTREE_SUCCESS) {
       rc = KVTREE_FAILURE;
       elem = NULL;
@@ -1722,7 +1722,7 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
   /* record total number of ranks in job as max rank + 1 */
   kvtree_set_kv_int(files_hash, "RANKS", ranks);
 
-  /* write out rank2file map */
+  /* write out root file */
   if (kvtree_write_file(prefix, files_hash) != KVTREE_SUCCESS) {
     rc = KVTREE_FAILURE;
   }
