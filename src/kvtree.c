@@ -1291,9 +1291,6 @@ ssize_t kvtree_read_persist(const void* buf, size_t bufsize, kvtree* hash)
 /** executes logic of kvtree_read using an opened file descriptor */
 ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
 {
-  ssize_t nread;
-  size_t size = 0;
-
   /* check that we have a hash, a file name, and a file descriptor */
   if (file == NULL || fd < 0 || hash == NULL) {
     kvtree_err("Bad file/fd/hash in %s @ %s:%d",
@@ -1303,12 +1300,28 @@ ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
 
   /* read in the file header */
   char header[KVTREE_FILE_HASH_HEADER_SIZE];
-  nread = kvtree_read_attempt(file, fd, header, KVTREE_FILE_HASH_HEADER_SIZE);
+  ssize_t nread = kvtree_read_attempt(file, fd, header, KVTREE_FILE_HASH_HEADER_SIZE);
+  if (nread < 0) {
+    /* error while reading header */
+    kvtree_err("Failed to read header from %s @ %s:%d",
+      file, __FILE__, __LINE__);
+    return -1;
+  }
+  if (nread == 0) {
+    /* We've got an empty file.  It depends on the situation as to whether this is
+     * an error or not.  Do not print an error, and return 0 so someone can test.
+     * Any valid, non-empty file will return a positive size. */
+    return 0;
+  }
   if (nread != KVTREE_FILE_HASH_HEADER_SIZE) {
-    kvtree_err("Sizes %zu != %d in %s @ %s:%d",
+    /* read something but the expected size does not match */
+    kvtree_err("Invalid header: read %zu bytes but expected %d in %s @ %s:%d",
       nread, KVTREE_FILE_HASH_HEADER_SIZE, file, __FILE__, __LINE__);
     return -1;
   }
+
+  /* track our current offset within the read buffer */
+  size_t size = 0;
 
   /* read in the magic number, the type, and the version number */
   uint32_t magic;
@@ -1356,8 +1369,14 @@ ssize_t kvtree_read_fd(const char* file, int fd, kvtree* hash)
   ssize_t remainder = filesize - size;
   if (remainder > 0) {
     nread = kvtree_read_attempt(file, fd, buf + size, remainder);
+    if (nread < 0) {
+      kvtree_err("Failed to read file %s @ %s:%d",
+        file, __FILE__, __LINE__);
+      kvtree_free(&buf);
+      return -1;
+    }
     if (nread != remainder) {
-      kvtree_err("Failed to read file %s (%zu != %zu: filesize %zu) @ %s:%d",
+      kvtree_err("Failed to read file %s (read %zu bytes but expected %zu: filesize %zu) @ %s:%d",
         file, nread, remainder, filesize, __FILE__, __LINE__);
       kvtree_free(&buf);
       return -1;
