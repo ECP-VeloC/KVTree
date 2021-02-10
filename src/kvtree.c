@@ -1701,8 +1701,18 @@ int kvtree_write_close_unlock(const char* file, int* fd, const kvtree* hash)
 int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
 {
   int rc = KVTREE_SUCCESS;
+
   /* record up to 8K entries per file */
   long entries_per_file = 8192;
+
+  /*
+   * KVTREE_ENTRIES_PER_FILE is only used for testing.  Specifically, you can
+   * set it to something low like 1 to force kvwrite_write_to_gather() to write
+   * multiple kvtree files.
+   */
+  if (getenv("KVTREE_ENTRIES_PER_FILE")) {
+    entries_per_file = atol(getenv("KVTREE_ENTRIES_PER_FILE"));
+  }
 
   /* we hardcode this to be two levels deep */
 
@@ -1716,18 +1726,7 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
   /* iterate over each rank to record its info */
   int writer = 0;
   int max_rank = -1;
-
   kvtree_elem* elem = kvtree_elem_first(data);
-
-  /*
-   * KVTREE_ENTRIES_PER_FILE is only used for testing.  Specifically, you can
-   * set it to something low like 1 to force kvwrite_write_to_gather() to write
-   * multiple kvtree files.
-   */
-  if (getenv("KVTREE_ENTRIES_PER_FILE")) {
-    entries_per_file = atol(getenv("KVTREE_ENTRIES_PER_FILE"));
-  }
-
   while (elem != NULL) {
     /* create a hash to record an entry from each rank */
     kvtree* entries = kvtree_new();

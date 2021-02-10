@@ -145,8 +145,6 @@ static unsigned long kvtree_write_gather_map(
 
   /* get name of this process */
   int rank_world, ranks_world;
-
-
   MPI_Comm_rank(comm, &rank_world);
   MPI_Comm_size(comm, &ranks_world);
 

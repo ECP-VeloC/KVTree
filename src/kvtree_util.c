@@ -252,26 +252,23 @@ int kvtree_util_get_ptr(const kvtree* hash, const char* key, void** val)
  */
 int kvtree_read_scatter_single(const char* prefix, kvtree* data)
 {
-  int rc = KVTREE_SUCCESS;
-  unsigned long level, expected_ranks, actual_ranks = 0;
-  char *prefix_dir, *prefix_dir_copy = NULL, *prefix_file, *prefix_file_copy = NULL;
-  char tmp[PATH_MAX], pattern[PATH_MAX];
-  kvtree *subfile_tree = NULL, *subfile_rank_tree = NULL;
-  kvtree *final_tree = kvtree_new();
-
   /*
-   * Look at the high level kvtree and get the total number of ranks to
-   * expect.
+   * Read in high level kvtree.
    */
-  rc = kvtree_read_file(prefix, final_tree);
+  kvtree* final_tree = kvtree_new();
+  int rc = kvtree_read_file(prefix, final_tree);
   if (rc != KVTREE_SUCCESS) {
-    kvtree_free(&final_tree);
+    kvtree_delete(&final_tree);
     return rc;
   }
 
+  /*
+   * Get the total number of ranks to expect.
+   */
+  unsigned long expected_ranks;
   rc = kvtree_util_get_unsigned_long(final_tree, "RANKS", &expected_ranks);
   if (rc != KVTREE_SUCCESS) {
-    kvtree_free(&final_tree);
+    kvtree_delete(&final_tree);
     return rc;
   }
   kvtree_delete(&final_tree);
@@ -280,51 +277,53 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
   final_tree = kvtree_new();
 
   /* Look at all the subfiles with our prefix and read in the file lists */
-  prefix_dir_copy = strdup(prefix);
-  prefix_dir = dirname(prefix_dir_copy);
-  prefix_file_copy = strdup(prefix);
-  prefix_file = basename(prefix_file_copy);
+  char* prefix_dir_copy = strdup(prefix);
+  char* prefix_dir = dirname(prefix_dir_copy);
 
-  DIR *d;
-  struct dirent *dir;
-  d = opendir(prefix_dir);
+  char* prefix_file_copy = strdup(prefix);
+  char* prefix_file = basename(prefix_file_copy);
+
+  DIR* d = opendir(prefix_dir);
   if (!d) {
     rc = KVTREE_FAILURE;
     goto end;
   }
 
+  char pattern[PATH_MAX];
   sprintf(pattern, "%s.%%lu.%%lu", prefix_file);
   pattern[sizeof(pattern) - 1] = '\0';
 
   /* For each file/dir in our prefix dir */
+  unsigned long actual_ranks = 0;
+  struct dirent *dir;
   while ((dir = readdir(d)) != NULL) {
-    unsigned long num1, num2;
     /*
      * Search for any file starting with "prefix_file."
      * like "rank2file.".
      */
 
     /* Is this one of our subfiles?  It should have .x.y in the extension */
+    unsigned long num1, num2;
     rc = sscanf(dir->d_name, pattern, &num1, &num2);
     if (rc == 2) {  /* Did we get both numbers in the extension? */
       /* subfile matches */
 
       /* Construct the full path to the subfile kvtree */
+      char tmp[PATH_MAX];
       memset(tmp, 0, sizeof(tmp));
       snprintf(tmp, sizeof(tmp), "%s/%s", prefix_dir, dir->d_name);
       tmp[sizeof(tmp) - 1] = '\0';
 
       /* Read in the subfile */
-      subfile_rank_tree = NULL;
-      subfile_tree = kvtree_new();
-
+      kvtree* subfile_tree = kvtree_new();
       rc = kvtree_read_file(tmp, subfile_tree);
       if (rc == KVTREE_SUCCESS) {
-        /* Sanity: each subfile we want will have LEVEL=0 */
+        /* Each leaf file we want will have LEVEL=0 */
+        unsigned long level;
         rc = kvtree_util_get_unsigned_long(subfile_tree, "LEVEL", &level);
         if (rc == KVTREE_SUCCESS && level == 0) {
           /* Break off and remove the "RANK" subtree from the rank2file tree */
-          subfile_rank_tree = kvtree_extract(subfile_tree, "RANK");
+          kvtree* subfile_rank_tree = kvtree_extract(subfile_tree, "RANK");
           if (subfile_rank_tree) {
             if (kvtree_merge(final_tree, subfile_rank_tree) == KVTREE_SUCCESS) {
               actual_ranks += kvtree_size(subfile_rank_tree);
@@ -332,16 +331,18 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
           }
         }
       }
+
       kvtree_delete(&subfile_tree);
     }
   }
+
   closedir(d);
   kvtree_merge(data, final_tree);
   rc = KVTREE_SUCCESS;
 
 end:
-  free(prefix_dir_copy);
-  free(prefix_file_copy);
+  kvtree_free(&prefix_dir_copy);
+  kvtree_free(&prefix_file_copy);
   kvtree_delete(&final_tree);
   if (rc != KVTREE_SUCCESS || actual_ranks != expected_ranks) {
     return KVTREE_FAILURE;
