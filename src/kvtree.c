@@ -1796,7 +1796,6 @@ int kvtree_write_to_gather(const char* prefix, kvtree* data, int ranks)
 
   return rc;
 }
-///@}
 
 /*
  * Given a prefix passed to a kvtree_write_gather() (like "/tmp/rank2file",
@@ -1827,7 +1826,7 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
   kvtree* final_tree = kvtree_new();
   int rc = kvtree_read_file(prefix, final_tree);
   if (rc != KVTREE_SUCCESS) {
-    kvtree_free(&final_tree);
+    kvtree_delete(&final_tree);
     kvtree_err("Couldn't read in high level kvtree file %s\n", prefix);
     return rc;
   }
@@ -1835,7 +1834,7 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
   unsigned long expected_ranks;
   rc = kvtree_util_get_unsigned_long(final_tree, "RANKS", &expected_ranks);
   if (rc != KVTREE_SUCCESS) {
-    kvtree_free(&final_tree);
+    kvtree_delete(&final_tree);
     kvtree_err("Couldn't get RANKS for %s\n", prefix);
     return rc;
   }
@@ -1845,19 +1844,16 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
   final_tree = kvtree_new();
 
   /* Look at all the subfiles with our prefix and read in the file lists */
-  char* prefix_dir;
-  char* prefix_dir_copy = NULL;
-  char* prefix_file;
-  char* prefix_file_copy = NULL;
-  prefix_dir_copy = strdup(prefix);
-  prefix_dir = dirname(prefix_dir_copy);
-  prefix_file_copy = strdup(prefix);
-  prefix_file = basename(prefix_file_copy);
+  char* prefix_dir_copy = strdup(prefix);
+  char* prefix_dir = dirname(prefix_dir_copy);
+  char* prefix_file_copy = strdup(prefix);
+  char* prefix_file = basename(prefix_file_copy);
 
   /* Create our regex to match our prefix files */
   char pattern[PATH_MAX];
   snprintf(pattern, sizeof(pattern), "^%s\\.0\\.[0-9]+$", prefix_file);
   pattern[sizeof(pattern) - 1] = '\0';
+
   regex_t regex;
   rc = regcomp(&regex, pattern, REG_EXTENDED);
   if (rc) {
@@ -1865,17 +1861,15 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
     goto end;
   }
 
-  DIR* d;
-  struct dirent* dir;
-  d = opendir(prefix_dir);
+  DIR* d = opendir(prefix_dir);
   if (!d) {
     rc = KVTREE_FAILURE;
     goto end;
   }
 
-  char tmp[PATH_MAX];
-  unsigned long actual_ranks = 0;
   /* For each file/dir in our prefix dir */
+  unsigned long actual_ranks = 0;
+  struct dirent* dir;
   while ((dir = readdir(d)) != NULL) {
     /*
      * Search for any file starting with "prefix_file."
@@ -1887,15 +1881,13 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
       /* subfile matches */
 
       /* Construct the full path to the subfile kvtree */
+      char tmp[PATH_MAX];
       memset(tmp, 0, sizeof(tmp));
       snprintf(tmp, sizeof(tmp), "%s/%s", prefix_dir, dir->d_name);
       tmp[sizeof(tmp) - 1] = '\0';
 
       /* Read in the subfile */
-      kvtree* subfile_tree = NULL;
-      kvtree* subfile_rank_tree = NULL;
-      subfile_rank_tree = NULL;
-      subfile_tree = kvtree_new();
+      kvtree* subfile_tree = kvtree_new();
       rc = kvtree_read_file(tmp, subfile_tree);
       if (rc == KVTREE_SUCCESS) {
         /* Sanity: each subfile we want will have LEVEL=0 */
@@ -1903,7 +1895,7 @@ int kvtree_read_scatter_single(const char* prefix, kvtree* data)
         rc = kvtree_util_get_unsigned_long(subfile_tree, "LEVEL", &level);
         if (rc == KVTREE_SUCCESS && level == 0) {
           /* Break off and remove the "RANK" subtree from the rank2file tree */
-          subfile_rank_tree = kvtree_extract(subfile_tree, "RANK");
+          kvtree* subfile_rank_tree = kvtree_extract(subfile_tree, "RANK");
           if (subfile_rank_tree) {
             if (kvtree_merge(final_tree, subfile_rank_tree) == KVTREE_SUCCESS) {
               actual_ranks += kvtree_size(subfile_rank_tree);
@@ -1928,6 +1920,7 @@ end:
 
   return KVTREE_SUCCESS;
 }
+///@}
 
 /* ================================================= */
 /** @name Print hash and elements to stdout for debugging */
