@@ -17,6 +17,7 @@ SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # Configuration Options
 OPTION(MPI "Enable MPI operations for kvtrees" ON)
 OPTION(KVTREE_LINK_STATIC "Default to static linking? (Needed for Cray)" OFF)
+OPTION(TVDISPLAY "Whether to compile tv_data_display.c for debugging with TotalView C++View" OFF)
 
 SET(KVTREE_FILE_LOCK "FLOCK" CACHE STRING "Specify type of file locking to use (FLOCK FCNTL NONE)")
 SET_PROPERTY(CACHE KVTREE_FILE_LOCK PROPERTY STRINGS FLOCK FCNTL NONE)

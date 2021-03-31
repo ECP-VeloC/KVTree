@@ -5,6 +5,10 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
 # LIB KVTREE #
 ###########
 
+IF(TVDISPLAY)
+    ADD_DEFINITIONS(-DHAVE_TV)
+ENDIF(TVDISPLAY)
+
 # Install header files
 LIST(APPEND libkvtree_install_headers
     kvtree.h
@@ -21,8 +25,11 @@ LIST(APPEND libkvtree_noMPI_srcs
     kvtree_io.c
     kvtree_helpers.c
     kvtree_err.c
-    tv_data_display.c
 )
+
+IF(TVDISPLAY)
+    LIST(APPEND libkvtree_noMPI_srcs tv_data_display.c)
+ENDIF(TVDISPLAY)
 
 LIST(APPEND libkvtree_srcs
     kvtree.c
@@ -30,8 +37,11 @@ LIST(APPEND libkvtree_srcs
     kvtree_io.c
     kvtree_helpers.c
     kvtree_err.c
-    tv_data_display.c
 )
+
+IF(TVDISPLAY)
+    LIST(APPEND libkvtree_srcs tv_data_display.c)
+ENDIF(TVDISPLAY)
 
 IF(MPI_FOUND)
     LIST(APPEND libkvtree_srcs kvtree_mpi.c kvtree_mpi_io.c)
