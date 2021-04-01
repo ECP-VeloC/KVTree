@@ -56,6 +56,7 @@ int main(int argc, char** argv)
   char* tmp_str = NULL;
   char prefix[PATH_MAX];
   int rank, ranks;
+  kvtree* kvtree = NULL;
 
   if (argc != 2) {
     printf("USAGE:\n");
@@ -92,7 +93,7 @@ int main(int argc, char** argv)
   prefix[sizeof(prefix) - 1] = '\0';
 
   /* Read our PREFIX files */
-  kvtree* kvtree = kvtree_new();
+  kvtree = kvtree_new();
   rc = kvtree_read_scatter_single(prefix, kvtree);
   if (rc != KVTREE_SUCCESS) {
     printf("test_kvtree_read_scatter_single failed for %s\n", prefix);
