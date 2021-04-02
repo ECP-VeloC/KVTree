@@ -63,9 +63,9 @@ extern "C" {
  * and a pointer to another hash.
  */
 #define KVTREE_MAJOR "1"
-#define KVTREE_MINOR "0"
-#define KVTREE_PATCH "0"
-#define KVTREE_VERSION "1.0.0"
+#define KVTREE_MINOR "1"
+#define KVTREE_PATCH "1"
+#define KVTREE_VERSION "1.1.1"
 #define KVTREE_SUCCESS (0)
 #define KVTREE_MAX_FILENAME (1024)
 
