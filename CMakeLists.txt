@@ -16,11 +16,27 @@ SET(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # Configuration Options
 OPTION(MPI "Enable MPI operations for kvtrees" ON)
-OPTION(KVTREE_LINK_STATIC "Default to static linking? (Needed for Cray)" OFF)
-OPTION(TVDISPLAY "Whether to compile tv_data_display.c for debugging with TotalView C++View" OFF)
+MESSAGE(STATUS "MPI: ${MPI}")
+
+OPTION(BUILD_SHARED_LIBS "Whether to build shared libraries" ON)
+MESSAGE(STATUS "BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
+
+if (BUILD_SHARED_LIBS)
+   OPTION(KVTREE_LINK_STATIC "Default to static linking? (Needed for Cray)" OFF)
+else()
+   OPTION(KVTREE_LINK_STATIC "Default to static linking? (Needed for Cray)" ON)
+endif()
+MESSAGE(STATUS "KVTREE_LINK_STATIC: ${KVTREE_LINK_STATIC}")
+
+OPTION(ENABLE_TESTS "Whether to build tests" ON)
+MESSAGE(STATUS "ENABLE_TESTS: ${ENABLE_TESTS}")
 
 SET(KVTREE_FILE_LOCK "FLOCK" CACHE STRING "Specify type of file locking to use (FLOCK FCNTL NONE)")
 SET_PROPERTY(CACHE KVTREE_FILE_LOCK PROPERTY STRINGS FLOCK FCNTL NONE)
+MESSAGE(STATUS "KVTREE_FILE_LOCK: ${KVTREE_FILE_LOCK}")
+
+OPTION(TVDISPLAY "Whether to compile tv_data_display.c for debugging with TotalView C++View" OFF)
+MESSAGE(STATUS "TVDISPLAY: ${TVDISPLAY}")
 
 # Find Packages & Files
 
