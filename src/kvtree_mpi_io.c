@@ -626,7 +626,5 @@ cleanup_hashes:
   kvtree_delete(&recv);
   kvtree_delete(&send);
 
-cleanup:
-
   return rc;
 }

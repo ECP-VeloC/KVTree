@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 int main(int argc, char** argv){
-  int rank, ranks, kvtree_rc;
+  int rank, ranks;
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
