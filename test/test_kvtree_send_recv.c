@@ -12,8 +12,8 @@ int kvT_send_kvT_recv(int rank, int ranks){
   kvtree* send;
 //  int rc = TEST_PASS;
   int kvtree_rc;
-  int val_of_one, val_of_two, val_of_three;
-  const char one[] = "ONE", two[] = "TWO", three[] = "THREE";
+  int val_of_one, val_of_two;
+  const char one[] = "ONE", two[] = "TWO";
 
   send = kvtree_new();
   recv = kvtree_new();
@@ -143,7 +143,7 @@ int kvT_send_kvT_recv(int rank, int ranks){
   return TEST_PASS;
 }
 int kvT_send_recv(int rank, int ranks){
-  int rc, kvtree_rc;
+  int kvtree_rc;
   int val_of_one, val_of_two, val_of_three;
   kvtree* send = kvtree_new();
   kvtree* recv = kvtree_new();

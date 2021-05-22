@@ -88,7 +88,6 @@ printf("Rank = %d; ONE = %d; TWO = %d\n", rank, val_of_one, val_of_two);
 }
 
 int empty_broadcast_test(kvtree *kvtree_1, int rank){
-  int rc = TEST_PASS;
   int kvtree_rc = TEST_PASS;
   //re-initialize kvtree to empty n rank 0 and broadcast
   if(rank==0) kvtree_1 = kvtree_new();
@@ -115,9 +114,8 @@ int main(int argc, char** argv){
   //receving hash in receiving process.
  // int rc = TEST_PASS;
   int rank, ranks, kvtree_rc;
-  int val_of_one, val_of_two, val_of_three;
+  int val_of_one = 0, val_of_two = 0, val_of_three = 0;
   const char one[] = "ONE", two[] = "TWO", three[] = "THREE";
-  kvtree* kvtree;
   MPI_Init(&argc, &argv);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &ranks);
