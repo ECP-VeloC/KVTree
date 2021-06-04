@@ -11,9 +11,9 @@ LIST(APPEND kvtree_test_srcs
 )
 
 IF(KVTREE_LINK_STATIC)
-   SET(kvtree_lib kvtree-static)
+    SET(kvtree_lib kvtree-static)
 ELSE()
-   SET(kvtree_lib kvtree)
+    SET(kvtree_lib kvtree)
 ENDIF()
 
 ADD_EXECUTABLE(test_kvtree ${kvtree_test_srcs})
@@ -46,18 +46,22 @@ ADD_EXECUTABLE(kvtree_bcast_test test_kvtree_bcast.c)
 TARGET_LINK_LIBRARIES(kvtree_bcast_test ${KVTREE_EXTERNAL_LIBS} ${kvtree_lib})
 KVTREE_ADD_TEST(kvtree_bcast_test 256 "")
 #ADD_TEST(NAME kvtree_bcast_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_bcast_test)
+
 ADD_EXECUTABLE(kvtree_send_recv_test test_kvtree_send_recv.c)
 TARGET_LINK_LIBRARIES(kvtree_send_recv_test ${KVTREE_EXTERNAL_LIBS} ${kvtree_lib})
 KVTREE_ADD_TEST(kvtree_send_recv_test 256 "")
 #ADD_TEST(NAME kvtree_send_recv_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_send_recv_test)
+
 ADD_EXECUTABLE(kvtree_exchange_test test_kvtree_exchange.c)
 TARGET_LINK_LIBRARIES(kvtree_exchange_test ${KVTREE_EXTERNAL_LIBS} ${kvtree_lib})
 KVTREE_ADD_TEST(kvtree_exchange_test 256 "")
 #ADD_TEST(NAME kvtree_exchange_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_exchange_test)
+
 ADD_EXECUTABLE(kvtree_write_gather_test test_kvtree_write_gather.c)
 TARGET_LINK_LIBRARIES(kvtree_write_gather_test ${KVTREE_EXTERNAL_LIBS} ${kvtree_lib})
 KVTREE_ADD_TEST(kvtree_write_gather_test 256 "")
 #ADD_TEST(NAME kvtree_write_gather_test COMMAND ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 3 ./kvtree_write_gather_test)
+
 ADD_EXECUTABLE(kvtree_bad_arg_test test_kvtree_bad_arg.c)
 TARGET_LINK_LIBRARIES(kvtree_bad_arg_test ${KVTREE_EXTERNAL_LIBS} ${kvtree_lib})
 KVTREE_ADD_TEST(kvtree_bad_arg_test 256 "")
