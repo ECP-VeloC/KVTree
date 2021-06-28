@@ -1,6 +1,6 @@
 # Key-Value Tree (KVTree) Library
 
-[![Build Status](https://api.travis-ci.org/ECP-VeloC/KVTree.png?branch=master)](https://travis-ci.org/ECP-VeloC/KVTree)
+[![Build Status](https://api.travis-ci.org/ECP-VeloC/KVTree.png?branch=main)](https://travis-ci.org/ECP-VeloC/KVTree)
 
 The Key-Value Tree (KVTree) library provides a fully extensible C data
 structure modeled after Perl hashes.
@@ -61,6 +61,6 @@ Produced at the Lawrence Livermore National Laboratory.
 Copyright (c) 2018, UChicago Argonne LLC, operator of Argonne National Laboratory.
 
 
-For release details and restrictions, please read the [LICENSE](https://github.com/LLNL/KVTree/blob/master/LICENSE) and [NOTICE](https://github.com/LLNL/KVTree/blob/master/NOTICE) files.
+For release details and restrictions, please read the [LICENSE](https://github.com/LLNL/KVTree/blob/main/LICENSE) and [NOTICE](https://github.com/LLNL/KVTree/blob/main/NOTICE) files.
 
 `LLNL-CODE-751725` `OCEC-18-060`
