@@ -49,9 +49,11 @@ IF(MPI)
         INCLUDE_DIRECTORIES(${MPI_C_INCLUDE_PATH})
         LIST(APPEND KVTREE_EXTERNAL_LIBS ${MPI_C_LIBRARIES})
     ELSE(MPI_C_FOUND)
-        MESSAGE("WARNING: Could not find MPI!")
-        MESSAGE("         Either add an MPI compiler to your path (using modules)")
-        MESSAGE("         Or force CMake to build using the correct compiler (`export CC=mpicc`)")
+        MESSAGE(FATAL_ERROR
+            "Could not find MPI! "
+            "Either add an MPI compiler to your path "
+            "or force CMake to build using the correct compiler (`export CC=mpicc`). "
+            "To disable MPI, set -DMPI=OFF")
     ENDIF(MPI_C_FOUND)
 ENDIF(MPI)
 
