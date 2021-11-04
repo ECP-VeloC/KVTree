@@ -10,7 +10,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+
+/* get_nprocs() */
+#if defined(__APPLE__)
+#include <sys/sysctl.h>
+#else
 #include <sys/sysinfo.h>
+#endif
 
 #define PROCESSES 8
 #define ITERATIONS 1000
@@ -100,7 +106,19 @@ int main(int argc, char** argv)
 {
   int cpus;
 
-  cpus = get_nprocs();
+#if defined(__APPLE__)
+    int count;
+    size_t size = sizeof(count);
+    if (sysctlbyname("hw.ncpu", &count, &size, NULL, 0)) {
+        cpus = 1;
+    } else {
+        cpus = count;
+    }
+#else
+    cpus = get_nprocs();
+#endif
+
+
   if (cpus <= 1) {
     printf("We need more than 1 CPU to run this test.  Skipping.\n");
     return TEST_PASS;
