@@ -33,7 +33,7 @@ jobs:
         uses: ecp-veloc/github-actions/get-scr-os-deps@main
         with:
           os: ${{ matrix.os }}
-          mpi: $${{ matrix.mpi }}
+          mpi: ${{ matrix.mpi }}
 
       - name: configure
         run: |
