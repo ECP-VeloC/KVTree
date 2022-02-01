@@ -7,6 +7,7 @@
 
 #include "kvtree.h"
 #include "test_kvtree_util.h"
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -20,7 +21,7 @@
 
 #define PROCESSES 8
 #define ITERATIONS 1000
-#define TESTFILE "/dev/shm/test_kvtree_write_locking"
+#define TESTFILE "test_kvtree_write_locking"
 
 /*
  * This is our process function that writes the file and then tries to read it.
@@ -32,6 +33,9 @@ int process_func(int use_locking)
   int rc;
   int iterations = ITERATIONS;
 
+  char testfile[256];
+  sprintf(testfile, "%s/%s", KVTREE_TEST_BASE, TESTFILE);
+
   srand(1);
 
   while (iterations--) {
@@ -40,9 +44,9 @@ int process_func(int use_locking)
     kvtree_util_set_int64(kvtree, "DATA",  rand());
 
     if (use_locking) {
-      rc = kvtree_write_with_lock(TESTFILE, kvtree);
+      rc = kvtree_write_with_lock(testfile, kvtree);
     } else {
-      rc = kvtree_write_file(TESTFILE, kvtree);
+      rc = kvtree_write_file(testfile, kvtree);
     }
     kvtree_delete(&kvtree);
 
@@ -52,7 +56,7 @@ int process_func(int use_locking)
     }
 
     kvtree = kvtree_new();
-    if ((kvtree_read_with_lock(TESTFILE, kvtree) != KVTREE_SUCCESS)) {
+    if ((kvtree_read_with_lock(testfile, kvtree) != KVTREE_SUCCESS)) {
       /* Couldn't read file */
       kvtree_delete(&kvtree);
       return 1;

@@ -2,6 +2,8 @@
 # Build tests
 ###############
 
+INCLUDE_DIRECTORIES(${PROJECT_BINARY_DIR})
+
 LIST(APPEND kvtree_test_srcs
     test_kvtree.c
     test_kvtree_allocate_delete.c
