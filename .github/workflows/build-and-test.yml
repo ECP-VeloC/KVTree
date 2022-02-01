@@ -19,7 +19,7 @@ jobs:
 
     name: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.mpi }}
 
-    runs-on: $${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
 
     steps:
 
