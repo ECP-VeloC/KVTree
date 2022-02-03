@@ -35,18 +35,9 @@ jobs:
           os: ${{ matrix.os }}
           mpi: ${{ matrix.mpi }}
 
-      - name: configure
-        run: |
-          mkdir build
-          cd build
-          cmake ../kvtree -DCMAKE_BUILD_TYPE=${{ matrix.target }} -DMPI=${{ matrix.mpi == 'par' }}
-
-      - name: build
-        run: |
-          cd build
-          make
-
-      - name: check
-        run: |
-          cd build
-          make check
+      - name: build and test
+        uses: ecp-veloc/github-actions/cmake-build-test@main
+        with:
+          component: kvtree
+          target: ${{ matrix.target }}
+          cmake_line: "-DMPI=${{ matrix.mpi == 'par' }}"
