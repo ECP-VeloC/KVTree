@@ -1,6 +1,6 @@
 # Key-Value Tree (KVTree) Library
 
-[![Build Status](https://api.travis-ci.org/ECP-VeloC/KVTree.png?branch=main)](https://travis-ci.org/ECP-VeloC/KVTree)
+[![kvtree build and test](https://github.com/ECP-VeloC/KVTree/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/ECP-VeloC/KVTree/actions/workflows/build-and-test.yml)
 
 The Key-Value Tree (KVTree) library provides a fully extensible C data
 structure modeled after Perl hashes.
