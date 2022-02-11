@@ -35,9 +35,15 @@ jobs:
           os: ${{ matrix.os }}
           mpi: ${{ matrix.mpi }}
 
+      - name: build static
+        uses: ecp-veloc/github-actions/build-static@main
+        with:
+          component: kvtree
+          cmake_line: "-DMPI=${{ matrix.mpi == 'par' }}"
+
       - name: build and test
         uses: ecp-veloc/github-actions/cmake-build-test@main
         with:
           component: kvtree
           target: ${{ matrix.target }}
-          cmake_line: "-DMPI=${{ matrix.mpi == 'par' }} -DBUILD_SHARED_LIBS=ON -DKVTREE_LINK_STATIC=ON"
+          cmake_line: "-DMPI=${{ matrix.mpi == 'par' }}"
