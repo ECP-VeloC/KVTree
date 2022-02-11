@@ -36,7 +36,7 @@ jobs:
           mpi: ${{ matrix.mpi }}
 
       - name: build static
-        uses: ecp-veloc/github-actions/build-static@main
+        uses: ecp-veloc/github-actions/cmake-build-static@main
         with:
           component: kvtree
           cmake_line: "-DMPI=${{ matrix.mpi == 'par' }}"
