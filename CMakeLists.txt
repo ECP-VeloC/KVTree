@@ -45,26 +45,17 @@ LIST(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 ## MPI
 IF(MPI)
     INCLUDE(SetupMPI)
-    IF(MPI_C_FOUND)
-        INCLUDE_DIRECTORIES(${MPI_C_INCLUDE_PATH})
-        LIST(APPEND KVTREE_EXTERNAL_LIBS ${MPI_C_LIBRARIES})
-    ELSE(MPI_C_FOUND)
+    IF(NOT MPI_C_FOUND)
         MESSAGE(FATAL_ERROR
             "Could not find MPI! "
             "Either add an MPI compiler to your path "
             "or force CMake to build using the correct compiler (`export CC=mpicc`). "
             "To disable MPI, set -DMPI=OFF")
-    ENDIF(MPI_C_FOUND)
+    ENDIF(NOT MPI_C_FOUND)
 ENDIF(MPI)
 
 ## ZLIB
 FIND_PACKAGE(ZLIB REQUIRED)
-IF(ZLIB_FOUND)
-    INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-    LIST(APPEND KVTREE_EXTERNAL_LIBS ${ZLIB_LIBRARIES})
-    LIST(APPEND KVTREE_SERIAL_LIBS ${ZLIB_LIBRARIES})
-    LIST(APPEND KVTREE_LINK_LINE "-lz")
-ENDIF(ZLIB_FOUND)
 
 ## HEADERS
 INCLUDE(CheckIncludeFile)
