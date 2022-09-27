@@ -87,6 +87,22 @@ SET_SOURCE_FILES_PROPERTIES(${PROJECT_BINARY_DIR}/config.h PROPERTIES GENERATED 
 # Special Install Files
 INSTALL(FILES README.md DESTINATION ${CMAKE_INSTALL_DATADIR}/kvtree)
 
+# CMake configs
+
+# Install the exports file
+INSTALL(EXPORT kvtreeTargets FILE kvtreeTargets.cmake NAMESPACE kvtree:: DESTINATION share/kvtree/cmake)
+
+# Export so we can use in-tree
+EXPORT(EXPORT kvtreeTargets NAMESPACE kvtree:: FILE kvtreeTargets.cmake)
+
+# Setup the package config
+INCLUDE(CMakePackageConfigHelpers)
+CONFIGURE_PACKAGE_CONFIG_FILE(cmake/kvtreeConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/kvtreeConfig.cmake INSTALL_DESTINATION share/kvtree/cmake)
+WRITE_BASIC_PACKAGE_VERSION_FILE(${CMAKE_CURRENT_BINARY_DIR}/kvtreeConfigVersion.cmake COMPATIBILITY SameMajorVersion)
+
+# Install package config
+INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/kvtreeConfig.cmake ${CMAKE_CURRENT_BINARY_DIR}/kvtreeConfigVersion.cmake DESTINATION share/kvtree/cmake)
+
 # Package
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "KV Storage Library for Perl style hashes")
 SET(CPACK_PACKAGE_VENDOR "Lawrence Livermore National Laboratory")
