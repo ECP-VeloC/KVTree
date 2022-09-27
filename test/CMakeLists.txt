@@ -13,9 +13,9 @@ LIST(APPEND kvtree_test_srcs
 )
 
 IF(KVTREE_LINK_STATIC)
-    SET(kvtree_lib kvtree-static)
+    SET(kvtree_lib kvtree::kvtree-static)
 ELSE()
-    SET(kvtree_lib kvtree)
+    SET(kvtree_lib kvtree::kvtree)
 ENDIF()
 
 ADD_EXECUTABLE(test_kvtree ${kvtree_test_srcs})
