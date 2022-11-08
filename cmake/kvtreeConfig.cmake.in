@@ -2,7 +2,9 @@
 
 include(CMakeFindDependencyMacro)
 
-find_dependency(MPI REQUIRED)
+if (@MPI@)
+  find_dependency(MPI REQUIRED)
+endif (@MPI@)
 find_dependency(ZLIB REQUIRED)
 
 include("${CMAKE_CURRENT_LIST_DIR}/kvtreeTargets.cmake")
