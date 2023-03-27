@@ -16,8 +16,9 @@ jobs:
         os: [ubuntu-latest, macos-latest]
         target: [Debug, Release]
         mpi: [seq, par]
+        static: [both, static]
 
-    name: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.mpi }}
+    name: ${{ matrix.os }}-${{ matrix.target }}-${{ matrix.mpi }}-${{ matrix.static }}
 
     runs-on: ${{ matrix.os }}
 
@@ -35,16 +36,20 @@ jobs:
           os: ${{ matrix.os }}
           mpi: ${{ matrix.mpi }}
 
-      - name: build static
-        uses: ecp-veloc/github-actions/cmake-build-static@main
+      - name: configure
+        uses: ecp-veloc/github-actions/cmake-configure@main
         with:
           component: kvtree
           target: ${{ matrix.target }}
           cmake_line: "-DMPI=${{ matrix.mpi == 'par' }}"
+          static: ${{ matrix.static == 'static' }}
 
-      - name: build and test
-        uses: ecp-veloc/github-actions/cmake-build-test@main
+      - name: build
+        uses: ecp-veloc/github-actions/cmake-build@main
         with:
           component: kvtree
-          target: ${{ matrix.target }}
-          cmake_line: "-DMPI=${{ matrix.mpi == 'par' }}"
+
+      - name: test
+        uses: ecp-veloc/github-actions/cmake-test@main
+        with:
+          component: kvtree
