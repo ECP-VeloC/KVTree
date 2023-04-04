@@ -35,7 +35,7 @@ Some useful CMake command line options:
 
 - C
 - MPI (optional)
-- CMake, Version 2.8+
+- CMake, Version 3.14+
 
 ## Authors
 
