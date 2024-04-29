@@ -19,7 +19,7 @@ mkdir build
 mkdir install
 
 cd build
-cmake -DCMAKE_INSTALL_PREFIX=../install ../kvtree
+cmake -DCMAKE_INSTALL_PREFIX=../install ../KVTree
 make
 make install
 make test
